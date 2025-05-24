@@ -1,0 +1,72 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy Vue Project
+
+# Controls when the workflow will run
+on:
+  # puhs到main分支时触发
+  push:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # 1.Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2.安装nodejs环境
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.0'
+
+      # 3.安装依赖
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./flash-supermarket
+
+      # 4.1部署dist目录
+      - name: Deploy to server via SSH
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.SSH_HOST }}  # 服务器的IP或域名
+          username: ${{ secrets.SSH_USER }}  # 登录服务器的用户名
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # 使用 GitHub Secrets 中的私钥
+          source: "./flash-supermarket/dist"  # 本地 dist 目录中的内容
+          target: "/usr/share/nginx/html"  # 服务器上的目标路径
+      # 4.2部署nginx配置
+      - name: Deploy to server via SSH
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.SSH_HOST }}  # 服务器的IP或域名
+          username: ${{ secrets.SSH_USER }}  # 登录服务器的用户名
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # 使用 GitHub Secrets 中的私钥
+          source: "./flash-supermarket/nginx/nginx.conf"  # nginx配置
+          target: "/etc/nginx/conf.d"  # 服务器上的目标路径
+      # 5.重启nginx
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Write SSH private key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+      
+      - name: SSH to Remote Server and Deploy
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no "${{ secrets.SSH_USER }}"@"${{ secrets.SSH_HOST }}" << 'EOF'
+            sudo systemctl restart nginx
+          EOF
+      
+      - name: Cleanup SSH private key
+        run: rm private_key.pem
