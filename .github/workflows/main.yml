@@ -30,9 +30,13 @@ jobs:
         with:
           node-version: '20.18.0'
 
-      # 3.安装依赖
+      # 3.安装依赖并构建
       - name: Install dependencies
         run: npm install
+        working-directory: ./flash-supermarket
+      
+      - name: Build resources
+        run: npm run build
         working-directory: ./flash-supermarket
 
       # 4.1部署dist目录
