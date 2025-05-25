@@ -15,4 +15,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    historyApiFallback: true, // 👈 这一行解决刷新 404 问题
+  },
 })

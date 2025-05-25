@@ -1,10 +1,15 @@
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
 defineProps({
   msg: {
     type: String,
     required: true,
   },
 })
+const toWelcome = () => {
+  router.push('/welcome')
+}
 </script>
 
 <template>
@@ -14,6 +19,8 @@ defineProps({
       You’ve successfully created a project with
       <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
+      what fuck
+      <button @click="toWelcome()">to welcome</button>
     </h3>
   </div>
 </template>
