@@ -118,7 +118,7 @@
   <script setup>
   import { ref, computed, onMounted, onUnmounted, reactive , onBeforeUnmount } from "vue";
   import { useRouter } from 'vue-router';
-  import { setAvatarUrl, setUsername } from '../http/cookie'
+  import { getIsLogin, setAvatarUrl, setIsLogin, setUsername } from '../http/cookie'
   import {
     loginApi,
     registerApi
@@ -155,17 +155,16 @@
   const loginName = "登录";
   const handleLoginUser = () => {
     const info = {
-      username: inputFields.value[0].value,
-      password: inputFields.value[1].value,
+      userName: inputFields.value[0].value,
+      passWord: inputFields.value[1].value,
     }
-    console.log(info);
-    loginApi(info).then((response) => {
-      const res = response.data;
-      console.log(res);
+    loginApi(info).then((res) => {
       if (res.code == 200) {
         const data = res.data;
-        setUsername(data.username);
-        setAvatarUrl(data.avatarUrl);
+        setUsername(data.userName);
+        setAvatarUrl(data.avatar);
+        setIsLogin("true");
+        // console.log("isLogin", getIsLogin());
         ElMessageBox.alert("用户登录成功!", {
           confirmButtonText: "确定",
           center: true,
@@ -180,6 +179,8 @@
       );
       } else {
         ElMessage.error("用户登录失败");
+        console.log("用户登录失败:", res.message);
+        console.log("用户登录失败:", res.code);
       }
       return;
     })
@@ -196,18 +197,18 @@
       ElMessage.error("请输入完整信息");
       return;
     }
-    console.log([inputFields.value[4].value,inputFields.value[5].value])
+    // console.log([inputFields.value[4].value,inputFields.value[5].value])
     if(inputFields.value[4].value!==inputFields.value[5].value){
       ElMessage.error("两次输入的密码不一致");
       return;
     }
     const info = {
-      username: inputFields.value[2].value,
-      password: inputFields.value[4].value,
+      userName: inputFields.value[2].value,
+      passWord: inputFields.value[4].value,
     }
     try {
       registerApi(info).then((response) => {
-        console.log("发送注册成功:", response.data);
+        console.log(response);
         // 处理响应数据，例如保存token，跳转页面等
         const statusCode = response.code;
         if(statusCode==200){
@@ -219,6 +220,8 @@
             });
         }else{
           ElMessage.error("注册失败");
+          console.log("注册失败:", response.message);
+          console.log("注册失败:", response.code);
         }
       }) 
     } catch (error) {
