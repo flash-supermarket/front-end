@@ -1,7 +1,7 @@
 <template>
     <div class="header" :style="{ backgroundColor: `rgba(255, 255, 255, ${props.opacityValue})`, boxShadow: `0px 0px ${props.opacityValue*2}px grey inset`}">
         <div class="header-logo">
-            <img src="/shophub.png" class="logo" @click="gotoHome" style="width:50px;height:50px;margin-top:5px;margin-left:20px; cursor: pointer;" :style="{ display: showName ? 'inline-block' : 'none' }">
+            <img src="/shophub-title.png" class="logo" @click="gotoHome" style="width:150px;height:50px;margin-top:8px;margin-left:20px; cursor: pointer;" :style="{ display: showName ? 'inline-block' : 'none' }">
         </div>
         <div class="header-navigation">
             <div class="navigation-bar" @click="gotoCreate" :style="{color: `rgb(${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255})`,left: showName ? '170px' : '0px', top: '1px'}">创建清单</div>

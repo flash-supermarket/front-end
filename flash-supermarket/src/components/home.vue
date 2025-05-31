@@ -12,28 +12,24 @@
                 <span>b</span>
             </div>
             <el-autocomplete ref="autocompleteRef" style="position:relative; 
-                            width: 600px; 
-                            top: 300px; 
-                            left: calc(50% - (min(60%, 600px) + 60px)/ 2);
-                            height: 50px;"
-                            input-style="height:40px;font-size:20px" 
-                            :popper-options="{
-                                modifiers: [
-                                    {
-                                        name: 'computeStyles',
-                                        options: {
-                                            gpuAcceleration: false,
-                                            adaptive: false
-                                        }
-                                    }
-                                ]
-                            }" 
-                            :fit-input-width="true"
-                            v-model="state" 
-                            :fetch-suggestions="querySearchAsync" 
-                            placeholder="" 
-                            @select="handleSelect"
-                            @keydown.enter="goSearch()"/>
+                width: 600px; 
+                top: 300px; 
+                left: calc(50% - (min(60%, 600px) + 60px)/ 2);
+                height: 50px;" input-style="height:40px;
+                font-size:20px" :popper-options="{
+                    modifiers: [
+                        {
+                            name: 'computeStyles',
+                            options: {
+                            gpuAcceleration: false,
+                            adaptive: false
+                            }
+                        }
+                    ]
+                }" 
+                :fit-input-width="true"
+                v-model="state" :fetch-suggestions="querySearchAsync" placeholder="" @select="handleSelect"
+             @keydown.enter="goSearch()" />
             <el-button type="primary" style="position: relative; 
                 width:60px; 
                 top: 300px; 
@@ -172,6 +168,12 @@ onMounted(() => {
   justify-content: center;
 }
 
+.search-box {
+    position: absolute;
+    top: calc(min(300px, 50vh));
+    width: 100%;
+    height: 60px;
+}
 .title {
   font-family: arial;
   font-size: calc(min(130px, 10vw));
