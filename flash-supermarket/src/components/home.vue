@@ -29,12 +29,12 @@
                 }" 
                 :fit-input-width="true"
                 v-model="state" :fetch-suggestions="querySearchAsync" placeholder="" @select="handleSelect"
-             @keydown.enter="goSearch()" />
+             @keydown.enter="gotoSearch()" />
             <el-button type="primary" style="position: relative; 
                 width:60px; 
                 top: 300px; 
                 left: calc(50% - (min(60%, 600px) + 60px)/ 2);
-                height: 43px;" @click="goSearch()">
+                height: 43px;" @click="gotoSearch()">
                 <el-icon class="el-icon--search" style="font-size: 20px;">
                     <Search />
                 </el-icon>
@@ -119,9 +119,13 @@ const querySearchAsync = async (queryString: string, cb: (arg: any) => void) => 
         : links.value
     cb(results)
 }
-const goSearch = () => {
-  router.push({ path: '/search', query: { str: state.value } }).then(() => {
-    window.location.reload();
+const gotoSearch = (searchType = 'posts') => {
+  router.push({
+    path: '/search',
+    query: {
+      type: searchType, 
+      q: state.value
+    }
   });
 }
 const handleSelect = (item: Record<string, any>) => {

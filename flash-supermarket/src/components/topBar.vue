@@ -5,6 +5,8 @@
         </div>
         <div class="header-navigation">
             <div class="navigation-bar" @click="gotoCreate" :style="{color: `rgb(${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255})`,left: showName ? '170px' : '0px', top: '1px'}">创建清单</div>
+            <div class="navigation-bar" @click="gotoSearch('commodies','')" :style="{color: `rgb(${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255})`,left: showName ? '260px' : '90px', top: '1px'}">查找商品</div>
+            <div class="navigation-bar" @click="gotoSearch('users','')" :style="{color: `rgb(${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255}, ${(1 - props.opacityValue) * 255})`,left: showName ? '350px' : '180px', top: '1px'}">查找用户</div>
         </div>
         <div class="header-login">  
             <button v-if="!login_status" class="login-button" @click="gotoLogin">登录/注册</button>
@@ -40,6 +42,15 @@ const gotoHome = () => {
 }
 const gotoCreate = () => {
     router.push("/create");
+}
+const gotoSearch = (searchType = 'posts', keyword = '') => {
+  router.push({
+    path: '/search',
+    query: {
+      type: searchType, 
+      q: keyword       
+    }
+  });
 }
 const gotoLogin = () => {
     router.push("/login");
