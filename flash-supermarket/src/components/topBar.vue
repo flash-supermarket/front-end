@@ -44,15 +44,27 @@ const gotoCreate = () => {
 const gotoLogin = () => {
     router.push("/login");
 }
+import { getUsername, removeCookie } from '@/http/cookie';
+//这里是进入个人主页，因此请求自己的名字
 const gotoPerson= () => {
-    router.push("/person");
+    const username = getUsername();
+    console.log("个人主页的用户名", username);
+    router.push("/personPage/" + username);
 }
 const quitLogin = () => {
+    removeCookie();
     router.push("/login");
 }
+
+import { getIsLogin } from '@/http/cookie';
 onMounted(() => {
     updateWidth();
     window.addEventListener('resize', updateWidth);
+    if(getIsLogin()) {
+        login_status.value = true;
+    } else {
+        login_status.value = false;
+    }
 });
 
 const props = defineProps<{

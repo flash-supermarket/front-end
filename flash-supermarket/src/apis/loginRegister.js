@@ -1,16 +1,7 @@
-import axios from 'axios';
-
-const httpInstance = axios.create({
-  baseURL: 'http://localhost:3000/api',
-  Headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 20000,
-});
-
+import httpInstance from './globalConfig';
 
 export async function loginApi(data) {
-    return httpInstance.request({
+    const res = await httpInstance.request({
         url: '/login',
         method: 'post',
         data: data,
@@ -18,10 +9,16 @@ export async function loginApi(data) {
             'Content-Type': 'application/json'
         }
     })
+    if (res.status === 200) {
+        return res.data;
+    } else {
+        throw new Error('Login failed, res status is not 200', res.status);
+    }
+
 }
 
 export async function registerApi(data) {
-    return httpInstance.request({
+    const res = await httpInstance.request({
         url: '/register',
         method: 'post',
         data: data,
@@ -29,4 +26,9 @@ export async function registerApi(data) {
             'Content-Type': 'application/json'
         }
     })
+    if (res.status === 200) {
+        return res.data;
+    } else {
+        throw new Error('Register failed, res status is not 200', res.status);
+    }
 }

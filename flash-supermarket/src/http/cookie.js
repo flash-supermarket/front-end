@@ -1,9 +1,15 @@
 import cookie from 'js-cookie'
 
-const test_id = "test_id"
 
-const username = "username"
+const username = "no_login"
 const avatar_url = "avatar_url"
+const isLogin = "false"
+export const setIsLogin = (status) => {
+    cookie.set(isLogin, status, {expires: 1})
+}
+export const getIsLogin = () => {
+    return cookie.get(isLogin) === "true"
+}
 
 export const setUsername = (name) => {
     cookie.set(username, name, {expires: 1})
@@ -20,14 +26,8 @@ export const getAvatarUrl = () => {
 }
 
 
-
-
-export const setTestId = (id) => {
-    Cookies.set(test_id, id, {expires: 1})
-}
-export const getTestId = () => {
-    return Cookies.get(test_id)
-}
-export const removeTestId = () => {
-    Cookies.remove(test_id)
+export const removeCookie = () => {
+    cookie.remove(isLogin)
+    cookie.remove(username)
+    cookie.remove(avatar_url)
 }

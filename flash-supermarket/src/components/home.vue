@@ -127,6 +127,7 @@ const goSearch = () => {
 const handleSelect = (item: Record<string, any>) => {
     console.log(item)
 }
+
 onMounted(() => {
   if (container.value) { container.value.addEventListener('scroll', handleScroll); }
 });
