@@ -3,10 +3,12 @@ import { getIsLogin } from '@/http/cookie'
 import home from '../components/home.vue'
 import loginRegister from '../components/loginRegister.vue'
 import personPage from '../components/personPage.vue'
+import createArtical from '@/views/createArtical.vue'
 //对于需要登录的页面，使用 meta 属性标记
 const routes = [
   { path: '/login', component: loginRegister },
   { path: '/', component: home },
+  { path: '/create', component: createArtical },
   { path: '/personPage/:username', component: personPage, meta: { requiresAuth: true } },
 ]
 
