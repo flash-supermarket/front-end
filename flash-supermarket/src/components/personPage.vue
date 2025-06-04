@@ -43,13 +43,13 @@
         <div class="demo-collapse">
           <el-collapse v-model="activeName" accordion>
             <el-collapse-item title="Following" name="1">
-              <div v-for="item in followingList" :key="item.id">
+              <div v-for="item in followingList" :key="item.id" class="follow-fan-item" @click="gotoUser(item.username)">
                 <el-avatar :src="item.avatar_url" size="small"></el-avatar>
                 <span>{{ item.username }}</span>
               </div>
             </el-collapse-item>
             <el-collapse-item title="Follower" name="2">
-              <div v-for="item in fansList" :key="item.id">
+              <div v-for="item in fansList" :key="item.id" class="follow-fan-item" @click="gotoUser(item.username)">
                 <el-avatar :src="item.avatar_url" size="small"></el-avatar>
                 <span>{{ item.username }}</span>
               </div>
@@ -274,6 +274,9 @@ export default {
         ElMessage.error("An error occurred while following the user");
       });
     },
+    gotoUser(username) {
+      this.$router.push("/personPage/" + username);
+    }
   },
   computed: {
     totalPage() {
@@ -515,5 +518,9 @@ export default {
 .el-pagination :deep(.el-pagination__total) {
   font-size: 14px;
   margin-left: 8px;
+}
+
+.follow-fan-item {
+  cursor: pointer;
 }
 </style>
