@@ -1,108 +1,182 @@
 <template>
-  <div style="height: 100vh; display: flex; flex-direction: column;">
-    <!-- Top input area (30%) -->
-    <div style="flex: 3; padding: 1rem; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: center;" @click="logGoods(2)">
-      <input v-model="inputText" type="text" placeholder="Message ChatGPT..." style="width: 66%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);" />
-    </div>
-
-    <!-- Bottom content area (70%) -->
-    <div style="flex: 7; display: flex;">
-      <!-- Left list (50%) -->
-      <div style="flex: 1; overflow-y: auto; padding: 1rem; border-right: 1px solid #ccc;">
-        <div v-for="(item, index) in leftList" :key="item.id" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
-          <div style="display: flex; width: 80%;">
-            <img :src="item.image" alt="item" style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
-            <div style="display: flex; flex-direction: column; width: 50%;">
-              <span style="font-weight: bold;">{{ item.name }}</span>
-              <span style="font-size: 0.875rem; color: #666;">{{ item.price }}</span>
-              <span style="font-size: 0.75rem; color: #999;">{{ item.description }}</span>
+    <top-bar :opacityValue="1"></top-bar>
+    <div style="height: 90%; overflow: auto;">
+        <div
+            style="height: 20%; padding: 1rem; border-bottom: 1px solid #ccc; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div
+                style="width: 66%; height: 80%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); resize: none; justify-content: center; align-items: center;">
+                <div style="display: flex; justify-content: flex-end; height: 65%;">
+                    <textarea v-model="inputText" placeholder="输入你想要的帖子内容..."
+                        style="width: 100%; height: 100%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; font-size: 20px; outline: none; "></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button @click="handleSubmit"
+                        style="margin-top: 0.3rem; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background-color: #007bff; color: white; cursor: pointer;">提交</button>
+                </div>
             </div>
-          </div>
-          <div style="display: flex; flex-direction: column; align-items: center;">
-            <button @click="moveUp(index)" style="color: blue; margin-bottom: 0.25rem;">↑</button>
-            <button @click="moveDown(index)" style="color: blue; margin-bottom: 0.25rem;">↓</button>
-            <button @click="removeFromLeft(index)" style="color: red;">删除</button>
-          </div>
         </div>
-      </div>
 
-      <!-- Right list (50%) -->
-      <div style="flex: 1; padding: 1rem;">
-        <div style="text-align: center; margin-bottom: 1rem;">
-          <input v-model="searchText" type="text" placeholder="搜索..." style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); width: 66%;" />
-        </div>
-        <div v-for="item in filteredRightList" :key="item.id" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
-          <div style="display: flex; width: 80%;">
-            <img :src="item.image" alt="item" style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
-            <div style="display: flex; flex-direction: column; width: 50%;">
-              <span style="font-weight: bold;">{{ item.name }}</span>
-              <span style="font-size: 0.875rem; color: #666;">{{ item.price }}</span>
-              <span style="font-size: 0.75rem; color: #999;">{{ item.description }}</span>
+
+        <!-- Bottom content area (70%) -->
+        <div style="height: 70%; display: flex;">
+            <!-- Left list (50%) -->
+            <div style="flex: 1; overflow-y: auto; padding: 1rem; border-right: 1px solid #ccc; height: 100%;">
+                <div v-for="(item, index) in leftList" :key="item.id"
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
+                    <div style="display: flex; width: 80%;">
+                        <img :src="item.image" alt="item"
+                            style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                        <div style="display: flex; flex-direction: column; width: 50%;">
+                            <span style="font-weight: bold;">商品名：{{ item.name }}</span>
+                            <span style="font-size: 0.875rem; color: #666;">价格：{{ item.price }}</span>
+                            <span style="font-size: 0.75rem; color: #999;">简介：{{ item.description[0] }}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <button @click="moveUp(index)" style="color: blue; margin-bottom: 0.25rem;">↑</button>
+                        <button @click="moveDown(index)" style="color: blue; margin-bottom: 0.25rem;">↓</button>
+                        <button @click="removeFromLeft(index)" style="color: red;">删除</button>
+                    </div>
+                </div>
             </div>
-          </div>
-          <button @click="addToLeft(item)" style="color: green;">添加</button>
+
+            <!-- Right list (50%) -->
+            <div style="flex: 1; padding: 1rem; overflow-y: auto; height: 100%;">
+                <div style="text-align: center; margin-bottom: 1rem; justify-content: center; ">
+                    <input v-model="searchText" type="text" placeholder="搜索..."
+                        style="padding: 0.5rem; border: 1px solid #ccc; outline: none; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); width: 66%;" 
+                        @keydown.enter="handleChange"/>
+                    <!-- <img src="../assets/icon/search.png" style="width: 30px; margin-top: 30px;" /> -->
+                </div>
+                <div v-for="item in rightList" :key="item.id"
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
+                    <div style="display: flex; width: 80%;">
+                        <img :src="item.image" alt="item"
+                            style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                        <div style="display: flex; flex-direction: column; width: 50%;">
+                            <span style="font-weight: bold;">商品名：{{ item.name }}</span>
+                            <span style="font-size: 0.875rem; color: #666;">价格：{{ item.price }}</span>
+                            <span style="font-size: 0.75rem; color: #999;">简介：{{ item.description[0] }}</span>
+                        </div>
+                    </div>
+                    <button @click="addToLeft(item)" style="color: green;">添加</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import { searchNGoods } from '@/es/searchGoods'
+import { ref } from 'vue'
+import topBar from "@/components/topBar.vue";
+import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
+import {  } from "@/LLM/gptapi"
+import { chooseGoods, fixQuery, goods2ES } from '@/LLM/gpt4create';
 
 interface Item {
-  id: number
-  image: string
-  name: string
-  price: string
-  description: string
-}
-
-const logGoods = (n) => {
-    console.log(searchNGoods(n));
+    id: number
+    image: string
+    name: string
+    price: string
+    description: string
+    category: string
 }
 
 const inputText = ref('')
 const searchText = ref('')
 
-const leftList = ref<Item[]>([])
-const rightList = ref<Item[]>([
-  { id: 1, image: 'https://via.placeholder.com/50', name: '商品A', price: '¥100', description: '描述A' },
-  { id: 2, image: 'https://via.placeholder.com/50', name: '商品B', price: '¥200', description: '描述B' },
-  { id: 3, image: 'https://via.placeholder.com/50', name: '商品C', price: '¥300', description: '描述C' },
-])
+const handleSubmit = () => {
+    generateArtical(inputText.value);
+}
 
-const filteredRightList = computed(() => {
-  return rightList.value.filter(item => item.name.includes(searchText.value))
-})
+const handleChange = () => {
+    searchGoods(searchText.value);
+}
+
+const leftList = ref<Item[]>([])
+const rightList = ref<Item[]>([])
+
+const searchGoods = async (query: string) => {
+    let goods = [];
+    if (query === '') {
+        goods = await searchNGoods(10);
+    }
+    else {
+        goods = await searchQueryGoods(query);
+    }
+    rightList.value = []
+    for (let good of goods) {
+        rightList.value.push(goods2item(good))
+    }
+}
+
+searchGoods('');
+
+const goods2item = (goods): Item => {
+    return {
+        id: goods._id,
+        image: goods._source.images[0].large,
+        name: goods._source.title,
+        price: goods._source.price,
+        description: goods._source.description,
+        category: goods._source.main_category
+    }
+}
 
 const addToLeft = (item: Item) => {
-  if (!leftList.value.find(i => i.id === item.id)) {
-    leftList.value.push(item)
-  }
+    leftList.value.push(item);
 }
 
 const removeFromLeft = (index: number) => {
-  leftList.value.splice(index, 1)
+    leftList.value.splice(index, 1)
 }
 
 const moveUp = (index: number) => {
-  if (index > 0) {
-    const temp = leftList.value[index - 1]
-    leftList.value[index - 1] = leftList.value[index]
-    leftList.value[index] = temp
-  }
+    if (index > 0) {
+        const temp = leftList.value[index - 1]
+        leftList.value[index - 1] = leftList.value[index]
+        leftList.value[index] = temp
+    }
 }
 
 const moveDown = (index: number) => {
-  if (index < leftList.value.length - 1) {
-    const temp = leftList.value[index + 1]
-    leftList.value[index + 1] = leftList.value[index]
-    leftList.value[index] = temp
-  }
+    if (index < leftList.value.length - 1) {
+        const temp = leftList.value[index + 1]
+        leftList.value[index + 1] = leftList.value[index]
+        leftList.value[index] = temp
+    }
+}
+
+const generateArtical = async (query: string) => {
+    let failed_list = [];
+    let good_list: string[] = await fixQuery(query);
+    for (let goods of good_list) {
+        let esQuery = await goods2ES(goods);
+        searchText.value = goods;
+        await searchLLMGoods(esQuery);
+
+        let find_goods = [];
+        for (let i = 0;i<10 && i < rightList.value.length;i++) {
+            find_goods.push(rightList.value[0].name);
+        }
+
+        if (find_goods.length === 0) {
+            failed_list.push(goods);
+        }
+        else {
+            let index = await chooseGoods(find_goods, goods);
+            leftList.value.push(rightList.value[index]);
+        }
+    }
+}
+
+const searchLLMGoods = async (query) => {
+    let goods = await searchAnyGoods(query);
+    rightList.value = []
+    for (let good of goods) {
+        rightList.value.push(goods2item(good))
+    }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
