@@ -11,13 +11,17 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
     "element-plus": "^2.9.11",
     "js-cookie": "^3.0.5",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@types/node": "^22.15.29",
     "@vitejs/plugin-vue": "^5.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2"
   }
