@@ -66,6 +66,9 @@
               </el-tab-pane>
             </el-tabs>
           </div>
+          <div class="recommend-refreash">
+            点击刷新
+          </div>
         </div>
     </div>
 </template>
@@ -288,7 +291,7 @@ onMounted(() => {
   width: min(calc(90% - 40px), 1010px);
   padding-left: 20px;
   padding-right: 20px;
-  min-height: 500px;
+  height: 970px;
   background-color: rgba(255, 255, 255, 1);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -310,5 +313,21 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
+}
+
+.recommend-refreash {
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  color: black;
+  top: 930px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  cursor: pointer;
+  width: max-content; 
+}
+.recommend-refreash:hover {
+  color: #f8b811;
+  text-decoration: underline;
 }
 </style>
