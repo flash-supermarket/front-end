@@ -157,7 +157,7 @@ const generateArtical = async (query: string) => {
 
         let find_goods = [];
         for (let i = 0;i<10 && i < rightList.value.length;i++) {
-            find_goods.push(rightList.value[0].name);
+            find_goods.push(rightList.value[i].name);
         }
 
         if (find_goods.length === 0) {
