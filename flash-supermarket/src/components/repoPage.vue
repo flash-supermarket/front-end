@@ -1,6 +1,6 @@
 <template>
   <div class="background">
-    <el-button class="ret-btn">返回</el-button>
+    <el-button class="ret-btn" @click="retBack">返回</el-button>
     
 
       <!-- <el-header>Header</el-header> -->
@@ -23,6 +23,24 @@
               @click="unFollow">已关注</el-button>
             <el-button v-else type="danger" icon="Plus" @click="followUser" class="info-btn">关注</el-button>
           </div>
+          <div class="user-content">
+            {{ info.content }}
+          </div>
+          <div class="user-option">
+            <div class="star-warp">
+              <i class="iconfont" v-if="isStarred==true" style="color: #d32626;">&#xe626;</i>
+              <i class="iconfont" v-else>&#xe626;</i>
+              <span class="wrap-item">{{ starNum }}</span>
+            </div>
+            <div class="collect-wrap">
+              <el-icon size="35" class="iconSet">
+              <StarFilled v-if="isCollected==true" class="wrap-item"/>
+              <Star v-else class="wrap-item"/>
+              </el-icon>
+              <span>{{ collectNum }}</span>
+            </div>
+            
+          </div>
         </el-main>
       </el-container>
 
@@ -35,6 +53,7 @@
 <script>
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getUsername } from "@/http/cookie";
+import { searchNGoods } from "@/es/searchGoods"
 export default {
   name: "repoPage",
 
@@ -46,10 +65,16 @@ export default {
         avatar: "",
         name: "",
         title: "",
-        content: "",
+        content: "this is a test content",
       },
+      repoId: "",
       username: "",
       fansList: [],
+      collectList: [],
+      starList: [],
+      starNum: "12",
+      collectNum: "13",
+      iconSize: 20,
     };
   },
   methods: {
@@ -113,15 +138,33 @@ export default {
     },
     gotoUser(username) {
       this.$router.push("/personPage/" + username);
+    },
+    retBack(){
+      this.$router.go(-1);
     }
   },
   computed: {
     isUser(){
-      return true;
+      return getUsername() === this.username;
     },
     isFollowed(){
+      return this.fansList.some((item) => item.username === this.username);
+    },
+    isCollected(){
+      return true;
+    },
+    isStarred(){
       return true;
     }
+  },
+  mounted() {
+    // const num = 2;
+    // searchNGoods(num).then((res) => {
+    //   console.log(res);
+    // })
+    // .catch((error) => {
+    //   console.error("Error fetching data:", error);
+    // });
   },
 };
 </script>
@@ -149,7 +192,7 @@ export default {
   /* 圆角大小 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   /* 可选阴影效果 */
-  width: 90%;
+  width: 70%;
   /* 宽度控制 */
   max-width: 1200px;
   /* 最大宽度 */
@@ -164,12 +207,12 @@ export default {
   background-color: #1c2024;
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
-  width: 49%;
+  width: 60%;
 }
 .right {
   
   padding: 0;
-  
+  overflow: hidden;
 }
 .loop-show{
   display: flex;
@@ -187,12 +230,53 @@ export default {
   text-align: center;
 }
 .user-info{
+  overflow: hidden;
   display: flex;
   /* justify-content: center; */
   align-items: center; 
   flex-direction: row;
   flex-wrap: wrap;
   padding: 20px;
+}
+.user-content{
+  overflow: hidden;
+  border-top:#afb1b4 solid 1px;
+
+  margin: 10px 10px;
+  padding: 10px 0;
+  height: 70%;
+}
+.user-option{
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  flex-direction: row;
+  border-top:#afb1b4 solid 1px;
+  margin: 10px;
+  padding: 10px 0;
+  height: 46px;
+}
+.star-warp{
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+.collect-wrap{
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  margin-left: 14px;
+}
+.iconfont {
+  cursor: pointer;
+}
+.iconSet{
+  cursor: pointer;
+  color: #e1df5c
+}
+.wrap-item{
+  margin-left: 4px;
 }
 .info-img{
   text-align: center;
