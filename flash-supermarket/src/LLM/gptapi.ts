@@ -30,7 +30,6 @@ export async function chatWithGPT(system: string, user: string) {
         });
 
         const reply = JSON.parse(response.data.choices[0].message.content);
-        console.log(reply);
         return reply;
     } catch (error: any) {
         console.error('调用 OpenAI API 出错:', error.response?.data || error.message);
