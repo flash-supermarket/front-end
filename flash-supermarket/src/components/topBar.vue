@@ -9,7 +9,7 @@
         <div class="header-login">  
             <button v-if="!login_status" class="login-button" @click="gotoLogin">登录/注册</button>
             <el-dropdown v-else placement="bottom">
-                <el-avatar class="login-avatar" :size="36" fit="cover" src="/shophub.png">
+                <el-avatar class="login-avatar" :size="36" fit="cover" :src="avatar">
                 </el-avatar>
                 <template #dropdown>
                     <el-dropdown-menu>
@@ -25,6 +25,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import avatar from '../assets/avatar.png'
 
 const login_status  = ref(false);
 const showName = ref(true);
@@ -83,99 +84,99 @@ const props = defineProps<{
 
 <style scoped>
 .header {
-width: 100%;
-height: 60px;
-line-height: 60px;
-position: sticky;
-z-index: 999;
-left: 0;
-top: 0;
-background-color: white;
-opacity: 1;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    position: sticky;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    background-color: white;
+    opacity: 1;
 }
 .header-logo {
-position: absolute;
-height: 100%;
-left: 0;
-min-width: 50px;
+    position: absolute;
+    height: 100%;
+    left: 0;
+    min-width: 50px;
 }
 .header-navigation {
-position: absolute;
-max-width: 55%;
-height: 100%;
-left: 10px;
+    position: absolute;
+    max-width: 55%;
+    height: 100%;
+    left: 10px;
 }
 .header-login {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  right: 0px;
-  width: 110px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 0px;
+    width: 110px;
 }
 .login-button {
-  position: absolute;
-  top: 13px;
-  text-align: center;
-  padding: 9px 17px;
-  width: 90px;  
-  height: 35px;
-  font-size: 13px;
-  color: white;
-  background-color: rgba(0,123,255,1);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    position: absolute;
+    top: 13px;
+    text-align: center;
+    padding: 9px 17px;
+    width: 90px;  
+    height: 35px;
+    font-size: 13px;
+    color: white;
+    background-color: rgba(0,123,255,1);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .login-avatar {
-  position: absolute;
-  right: -100px;
-  top: 12px;
-  font-size: 16px;
-  background-color: white;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    position: absolute;
+    right: -100px;
+    top: 12px;
+    font-size: 16px;
+    background-color: white;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 .navigation-title {
-position: absolute;
-color:rgb(51, 136, 199);
-font-family: Arial, Helvetica, sans-serif;
-font-weight:550;
-width: 150px;
-font-size:27px;
+    position: absolute;
+    color:rgb(51, 136, 199);
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight:550;
+    width: 150px;
+    font-size:27px;
 }
 .navigation-title:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 .navigation-bar {
-position: absolute;
-width: 80px;
-height: 100%;
-font-family: "Arial";
-font-size: 18px;
-text-align: center;
+    position: absolute;
+    width: 80px;
+    height: 100%;
+    font-family: "Arial";
+    font-size: 18px;
+    text-align: center;
 }
 .navigation-bar:hover {
-cursor: pointer;
+    cursor: pointer;
 }
 .navigation-bar1 {
-left: 180px;
+    left: 180px;
 }
 .navigation-bar2 {
-left: 280px;
+    left: 280px;
 }
 .avatar {
-position: absolute;
-top: 11px;
-right: 10px;
-box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
-cursor: pointer;
+    position: absolute;
+    top: 11px;
+    right: 10px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
 }
 .avatar:hover{
-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
 }
 </style>

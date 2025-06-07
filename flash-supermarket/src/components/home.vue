@@ -1,6 +1,6 @@
 <template>
     <div class="container" ref="container">
-        <topBar :opacity-value="1 - bgOpacity" style="width: 100%; height: 60px;" />
+        <topBar :opacity-value="1" style="width: 100%; height: 60px;" />
         <div class="main" :style="{ opacity: bgOpacity }">
             <div class="title">
                 <span>S</span>
@@ -11,12 +11,16 @@
                 <span>u</span>
                 <span>b</span>
             </div>
-            <el-autocomplete ref="autocompleteRef" style="position:relative; 
-                width: 600px; 
+            <el-autocomplete ref="autocompleteRef" class="search-box" style="position:relative; 
+                width: min(60%, 600px); 
                 top: 300px; 
                 left: calc(50% - (min(60%, 600px) + 60px)/ 2);
-                height: 50px;" input-style="height:40px;
-                font-size:20px" :popper-options="{
+                height: 50px;"
+                input-style="
+                    height:40px; 
+                    font-size:20px
+                    background-color: transparent;" 
+                :popper-options="{
                     modifiers: [
                         {
                             name: 'computeStyles',
@@ -34,14 +38,37 @@
                 width:60px; 
                 top: 300px; 
                 left: calc(50% - (min(60%, 600px) + 60px)/ 2);
-                height: 43px;" @click="gotoSearch()">
+                height: 43px;
+                background-color: #f8b811;
+                border-color: #f8b811;" 
+                @click="gotoSearch()">
                 <el-icon class="el-icon--search" style="font-size: 20px;">
                     <Search />
                 </el-icon>
             </el-button>
         </div>
         <div class="recommend">
-            
+          <div class="recommend-container">
+            <el-tabs v-model="activeTab" class="recommend-tabs">
+              <el-tab-pane label="推荐内容" name="default">
+                <div class="tab-scroll">
+                  <div class="tab-content">
+                    <PostCard v-for="(post, i) in recommend_posts" :key="i" :post="post" />
+                  </div>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="关注的人" name="following">
+                <div class="tab-scroll">
+                  <div class="tab-content">
+                    <PostCard v-for="(post, i) in follow_posts" :key="i" :post="post" />
+                  </div>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+          <div class="recommend-refreash">
+            点击刷新
+          </div>
         </div>
     </div>
 </template>
@@ -50,6 +77,7 @@
 import { onMounted, ref, defineComponent } from 'vue'
 import { useRouter } from 'vue-router';
 import topBar from "@/components/topBar.vue"
+import PostCard from "@/components/post.vue"
 defineComponent({
     components: {
         topBar
@@ -59,12 +87,15 @@ interface LinkItem {
   value: string
   link: string
 }
+const recommend_posts = ["P1","P2","P3","P4","P5","P6","P7","P8","P9"]
+const follow_posts = ["P1","P2","P3","P4","P5","P6","P7","P8","P9"]
 const router = useRouter()
 const links = ref<LinkItem[]>([])
 const state = ref('')
 const bgOpacity = ref(1)
 const container = ref(null)
 const autocompleteRef = ref(null)
+const activeTab = ref('default')
 const handleScroll = () => {
   const scrollTop = container.value.scrollTop;
   const clientHeight = container.value.clientHeight;
@@ -161,28 +192,26 @@ onMounted(() => {
   position: absolute;
   left: 0;
   width: 100%;
-  height: max(100vh, 600px);
+  height: 400px;
   top: 0;
-  background: black url(../assets/home_bg.jpg) center bottom no-repeat;
-  background-size: 100vw 100vh;
-}
-
-.out-block {
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .search-box {
-    position: absolute;
-    top: calc(min(300px, 50vh));
-    width: 100%;
-    height: 60px;
+  border: 1px solid #5698c3;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #5698c3;
+  padding: 6px 10px;
+}
+
+.search-box input {
+  background-color: transparent !important;
+  border: none !important;
+  color: #5698c3;
 }
 .title {
-  font-family: arial;
-  font-size: calc(min(130px, 10vw));
-  font-weight: bold;
+  font-size: 130px;
+  color: #5698c3;
   position: absolute;
   top: calc(min(100px, 25vh));
   width: fit-content;
@@ -191,9 +220,8 @@ onMounted(() => {
 }
 
 .title>span {
-  color: #e5f0ff;
-  ;
-  font-family: arial;
+  color: #5698c3;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: calc(min(130px, 10vw));
   font-weight: bold;
   animation: textColorChange 6s infinite alternate;
@@ -201,23 +229,23 @@ onMounted(() => {
 
 @keyframes textColorChange {
   0% {
-    color: #ffffff;
+    color: #11659a;
   }
 
   25% {
-    color: #d5e7ff;
+    color: #5698c3;
   }
 
   50% {
-    color: #aed1ff;
+    color: #1e3b7a;
   }
 
   75% {
-    color: #d5e7ff;
+    color: #5698c3;
   }
 
   100% {
-    color: #ffffff;
+    color: #11659a;
   }
 }
 
@@ -253,8 +281,53 @@ onMounted(() => {
   position: absolute;
   left: 0;
   width: 100%;
-  height: max(100vh, 600px);
-  top: max(100vh, 600px);
+  height: 1000px;
+  top: 400px;
 }
 
+.recommend-container {
+  position: absolute;
+  left: max(5%, 50% - 525px);
+  width: min(calc(90% - 40px), 1010px);
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 970px;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+.recommend-tabs {
+  font-family: Arial, Helvetica, sans-serif;
+  --el-tabs-header-height: 48px;
+}
+.tab-scroll {
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: none; /* Firefox */
+}
+.tab-content {
+  padding: 16px;
+  min-width: 1000px;
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.recommend-refreash {
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  color: black;
+  top: 930px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  cursor: pointer;
+  width: max-content; 
+}
+.recommend-refreash:hover {
+  color: #f8b811;
+  text-decoration: underline;
+}
 </style>
