@@ -5,56 +5,43 @@
     <!-- <el-header>Header</el-header> -->
     <el-container class="container">
       <el-aside width="49%" class="left">
-        <el-carousel
-          :interval="5000"
-          arrow="hover"
-          height="680px"
-          indicator-position="outside"
-        >
-          <el-carousel-item
-            v-for="item in itemList"
-            :key="item"
-            class="loop-show"
-          >
+        <el-carousel :interval="5000" arrow="hover" height="680px" indicator-position="outside">
+          <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
             <el-image class="img-show" :src="item.url" fit="contain" />
-            <el-descriptions
-              class="margin-top"
-              :column="2"
-              size="small"
-              :border=true
-            >
+            <el-descriptions class="margin-top" :column="2" size="small" :border=true>
               <el-descriptions-item>
                 <template #label>
                   <div class="cell-item">
-                    <el-icon size="12">
+                    <!-- <el-icon size="12">
                       <Menu/>
-                    </el-icon>
-                    Name
+                    </el-icon> -->
+                    <span>商品名</span>
                   </div>
                 </template>
-            {{ item.name }}
+                <span style="font-weight: bold;font-size: 16px;">{{ item.name }}</span>
+
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
                   <div class="cell-item">
-                    <el-icon size="12">
+                    <!-- <el-icon size="12">
                       <PriceTag />
-                    </el-icon>
-                    Price
+                    </el-icon> -->
+                    <span>价格</span>
                   </div>
                 </template>
-                {{item.price}}
+                {{ item.price }}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
                   <div class="cell-item">
-                    <el-icon size="12">
+                    <!-- <el-icon size="12">
                       <office-building />
-                    </el-icon>
-                    Description
+                    </el-icon> -->
+                    <span>简介</span>
                   </div>
                 </template>
-                {{item.description}}
+                {{ item.description }}
               </el-descriptions-item>
             </el-descriptions>
           </el-carousel-item>
@@ -62,43 +49,23 @@
       </el-aside>
       <el-main class="right" width="49%">
         <div class="user-info">
-          <el-avatar
-            size="large"
-            src=""
-            @click="gotoUser(username)"
-            class="info-img"
-          />
+          <el-avatar size="large" src="" @click="gotoUser(username)" class="info-img" />
           <div class="info-name">manKobe</div>
-          <el-button
-            v-if="isUser == false && isFollowed == true"
-            type="info"
-            icon="Operation"
-            class="info-btn"
-            @click="unFollow"
-            >已关注</el-button
-          >
-          <el-button
-            v-else
-            type="danger"
-            icon="Plus"
-            @click="followUser"
-            class="info-btn"
-            >关注</el-button
-          >
+          <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
+            @click="unFollow">已关注</el-button>
+          <el-button v-else type="danger" icon="Plus" @click="followUser" class="info-btn">关注</el-button>
         </div>
         <div class="user-content">
           {{ info.content }}
         </div>
         <div class="user-option">
           <div class="star-warp">
-            <i class="iconfont" v-if="isStarred == true" style="color: #d32626"
-              >&#xe626;</i
-            >
+            <i class="iconfont" v-if="isStarred == true" style="color: #d32626">&#xe626;</i>
             <i class="iconfont" v-else>&#xe626;</i>
             <span class="wrap-item">{{ starNum }}</span>
           </div>
           <div class="collect-wrap">
-            <el-icon size="35" class="iconSet">
+            <el-icon size="38" class="iconSet">
               <StarFilled v-if="isCollected == true" class="wrap-item" />
               <Star v-else class="wrap-item" />
             </el-icon>
@@ -226,16 +193,26 @@ export default {
     isStarred() {
       return true;
     },
+
   },
   mounted() {
     const num = 2;
     searchNGoods(num)
       .then((res) => {
         console.log(res);
-        for(item in res) {
-          const info = {};
-          info.url = item._source.
+        this.itemList = [];
+        for (let item of res) {
+          const goods = {
+            name: item._source.title,
+            description: item._source.description.join(''),
+            url: item._source.images[0].large,
+            price: item._source.price,
+            id: item._id,
+            category: item._source.main_category
+          }
+          this.itemList.push(goods);
         }
+        // console.log(this.itemList)
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -265,6 +242,7 @@ export default {
   position: relative;
   /* 外层背景色 */
 }
+
 .ret-btn {
   position: absolute;
   top: 1%;
@@ -289,35 +267,46 @@ export default {
   padding-bottom: 5px;
   /* 内边距 */
 }
+
 .left {
   background-color: #1c2024;
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
   width: 60%;
 }
+
 .right {
   padding: 0;
   overflow: hidden;
 }
+
 .loop-show {
   display: flex;
+
   justify-content: center;
-  /* align-items: center; */
+  align-items: center;
   flex-direction: column;
 }
+
 .cell-item {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
+  justify-content: center;
   text-align: center;
 }
+
 .img-show {
   width: 100%;
   height: auto;
 }
+
 .img-explain {
   color: white;
   text-align: center;
 }
+
 .user-info {
   overflow: hidden;
   display: flex;
@@ -327,6 +316,7 @@ export default {
   flex-wrap: wrap;
   padding: 20px;
 }
+
 .user-content {
   overflow: hidden;
   border-top: #afb1b4 solid 1px;
@@ -335,6 +325,7 @@ export default {
   padding: 10px 0;
   height: 70%;
 }
+
 .user-option {
   overflow: hidden;
   display: flex;
@@ -346,39 +337,48 @@ export default {
   padding: 10px 0;
   height: 46px;
 }
+
 .star-warp {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .collect-wrap {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-left: 14px;
 }
+
 .iconfont {
   cursor: pointer;
 }
+
 .iconSet {
   cursor: pointer;
-  color: #e1df5c;
+  color: rgb(245, 188, 90);
 }
+
 .wrap-item {
   margin-left: 4px;
 }
+
 .info-img {
   text-align: center;
 }
+
 .info-name {
   padding-left: 14px;
   font-size: 20px;
   text-align: center;
   /* font-weight: bold; */
 }
+
 .info-btn {
   margin-left: auto;
 }
+
 .el-carousel__item h3 {
   color: #475669;
   opacity: 0.75;

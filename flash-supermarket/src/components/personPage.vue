@@ -1,114 +1,98 @@
 <template>
   <div class="common-layout">
     <top-bar style="margin-bottom: 12px"></top-bar>
-    <el-dialog
-      v-model="dialogFormVisible"
-      title="编辑个人信息"
-      width="500"
-      @close="dialogFormVisible = false"
-    >
+    <el-dialog v-model="dialogFormVisible" title="编辑个人信息" width="500" @close="dialogFormVisible = false">
       <el-form>
         <el-form-item label="new password" :label-width="formLabelWidth">
-          <el-input
-            v-model="form.password"
-            style="width: 240px"
-            type="password"
-            placeholder="Please input password"
-            show-password
-          />
+          <el-input v-model="form.password" style="width: 240px" type="password" placeholder="Please input password"
+            show-password />
         </el-form-item>
         <el-form-item label="new description" :label-width="formLabelWidth">
-          <el-input
-            v-model="form.description"
-            maxlength="50"
-            style="width: 240px"
-            placeholder="Please input"
-            show-word-limit
-            type="textarea"
-          />
+          <el-input v-model="form.description" maxlength="50" style="width: 240px" placeholder="Please input"
+            show-word-limit type="textarea" />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogFormVisible = false" type="warning"
-            >取消</el-button
-          >
+          <el-button @click="dialogFormVisible = false" type="warning">取消</el-button>
           <el-button type="primary" @click="confirmEdit"> 提交修改 </el-button>
         </div>
       </template>
     </el-dialog>
-    <el-container class="main-container">
-      <el-aside width="200px">
-        <!--side bar-->
-        <div class="demo-collapse">
-          <el-collapse v-model="activeName" accordion>
-            <el-collapse-item title="Following" name="1">
-              <div v-for="item in followingList" :key="item.id" class="follow-fan-item" @click="gotoUser(item.username)">
-                <el-avatar :src="item.avatar_url" size="small"></el-avatar>
-                <span>{{ item.username }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="Follower" name="2">
-              <div v-for="item in fansList" :key="item.id" class="follow-fan-item" @click="gotoUser(item.username)">
-                <el-avatar :src="item.avatar_url" size="small"></el-avatar>
-                <span>{{ item.username }}</span>
-              </div>
-            </el-collapse-item>
-          </el-collapse>
+    <el-drawer v-model="drawer" title="I am the title" :with-header="false" direction="ltr" size="200">
+      <div class="drawer-wrap">
+        <span style="display: block;cursor: pointer;"
+          :style="{ 'font-weight': drawerShowType === 0 ? 'bold' : 'normal', 'color': drawerShowType === 0 ? '#FF0000' : '#000000' }"
+          @click="openDraw(0)">粉丝列表</span>
+        <span style="display: block;cursor: pointer;"
+          :style="{ 'font-weight': drawerShowType === 1 ? 'bold' : 'normal', 'color': drawerShowType === 1 ? '#FF0000' : '#000000' }"
+          @click="openDraw(1)">关注列表</span>
+        <div id="showedList">
+          <div v-for="item in showList" :key="item.username"
+            style="display: flex; align-items: center;margin-top: 15px;">
+            <el-avatar :src="item.avatar_url" style="margin-right: 12px"></el-avatar>
+            <span>{{ item.username }}</span>
+          </div>
         </div>
-      </el-aside>
+      </div>
+
+    </el-drawer>
+    <el-container class="main-container">
+
       <el-container>
         <el-header height="auto">
           <div class="user-info">
-            <el-avatar :src="avatar_url" :size="80"></el-avatar>
-            <div>
-              <h2>{{ username || "Username" }}</h2>
+            <el-avatar :src="avatar_url" :size="150" style="margin-right:24px"></el-avatar>
+            <div style="max-width: 30%;">
+              <h2 style="font-size: 24px;font-weight: 600;line-height: 120%;">{{ username || "Username" }}</h2>
               <div class="user-description">
                 {{ description || "No description available" }}
               </div>
+              <div class="fan-follow-wrap">
+                <div class="fan-follow-wrap-item">
+                  <span class="count">{{ followNum || 12 }}</span>
+                  <span class="show" @click="openDraw(1)">关注</span>
+                </div>
+                <div class="fan-follow-wrap-item">
+                  <span class="count">{{ fanNum || 13 }}</span>
+                  <span class="show" @click="openDraw(0)">粉丝</span>
+                </div>
+              </div>
             </div>
 
-            <el-button
-              v-if="isOwner == true"
-              icon="Edit"
-              type="primary"
-              @click="editInfo"
-              style="margin-right: 10px; margin-left: auto"
-            >
+            <el-button v-if="isOwner == true" icon="Edit" type="primary" @click="editInfo" class="info-btn">
               编辑个人信息
             </el-button>
-            <el-button
-              v-else-if="isFollowed == true"
-              type="info"
-              icon="Operation"
-              @click="unFollow"
-              style="margin-right: 10px; margin-left: auto"
-            >
+            <el-button v-else-if="isFollowed == true" type="info" icon="Operation" @click="unFollow" class="info-btn">
               已关注
             </el-button>
-            <el-button v-else type="danger" icon="Plus" @click="followUser" style="margin-right: 10px; margin-left: auto">
+            <el-button v-else type="danger" icon="Plus" @click="followUser" class="info-btn">
               关注
             </el-button>
           </div>
         </el-header>
         <el-main>
-          <div class="repo-list">
-            <div
-              v-for="repo in paginatedBoxes"
-              :key="repo.title"
-              class="repo-item"
-            >
-              <h3>{{ repo.title }}</h3>
-              <p>Details about {{ repo.title }}...</p>
+          <div class="type-wrap">
+            <el-button class="btn" round text type="plain" v-if="postShowType == 1"
+              @click="changePostList(0)">笔记</el-button>
+            <el-button class="btn choosen" round bg type="plain" v-else @click="changePostList(0)">笔记</el-button>
+
+            <el-button class="btn" round text type="plain" v-if="postShowType == 0 && isOwner == true"
+              @click="changePostList(1)">收藏</el-button>
+            <el-button class="btn choosen" round bg type="plain" v-else-if="postShowType == 1 && isOwner == true"
+              @click="changePostList(1)">收藏</el-button>
+            <el-button class="btn" round text type="plain" v-else disabled><el-icon>
+                <Lock />
+              </el-icon>收藏</el-button>
+          </div>
+          <div class="main-content-wrap">
+
+            <div class="post-wrap">
+
+              <PostCard v-for="(post, i) in showPostList" :key="i" :post="post" />
+
+
             </div>
-            <el-pagination
-              :current-page="currentPage"
-              :page-size="pageSize"
-              :hide-on-single-page="false"
-              :page-count="totalPage"
-              layout="prev, pager, next"
-              @current-change="handleCurrentChange"
-            />
           </div>
         </el-main>
       </el-container>
@@ -125,39 +109,25 @@ import {
   followUser,
 } from "@/apis/personPage.js";
 import topBar from "./topBar.vue";
-import { getUsername , getAvatarUrl} from "../http/cookie";
+import { getUsername, getAvatarUrl } from "../http/cookie";
 import { ElMessage } from "element-plus";
 import { ElMessageBox } from "element-plus";
+import avatar from "../assets/avatar.png"
+import PostCard from "./post.vue";
 export default {
   name: "personPage",
   components: {
     topBar,
+    PostCard,
   },
   data() {
     return {
       username: "",
-      description: "",
-      avatar_url: "",
+      description: "发撒赖打开附件是老大开发建设狄拉克发生的理发卡塑料袋放进啊十六分螺丝钉咖啡碱啊阿萨的浪费空间受到了开发技术的",
+      avatar_url: avatar,
       password: "",
-      activeName: "1",
-      repoList: [
-        { title: "Repo 1" },
-        { title: "Repo 2" },
-        { title: "Repo 3" },
-        { title: "Repo 4" },
-        { title: "Repo 5" },
-        { title: "Repo 6" },
-        { title: "Repo 7" },
-        { title: "Repo 8" },
-        { title: "Repo 9" },
-        { title: "Repo 10" },
-        { title: "Repo 11" },
-        { title: "Repo 12" },
-      ],
-      pageSize: 5, // Changed from 8 to 6
-      currentPage: 1,
-      followingList: [{ avatar_url: "", username: "User1" }],
-      fansList: [{ avatar_url: "", username: "User2" }],
+      followingList: [{ avatar_url: "", username: "User1" }, { avatar_url: "", username: "User2" }],
+      fansList: [{ avatar_url: "", username: "User2" }, { avatar_url: "", username: "User2" }],
       dialogFormVisible: false,
       formLabelWidth: "120px",
       form: {
@@ -166,12 +136,15 @@ export default {
         description: "",
         avatar: "",
       },
+      drawer: false,
+      drawerShowType: 0, //0粉丝，1关注
+
+      postShowType: 0, //0自己的文章，1收藏文章
+      myPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
+      myCollectPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
     };
   },
   methods: {
-    handleCurrentChange(newPage) {
-      this.currentPage = newPage;
-    },
     editInfo() {
       this.form.password = this.password;
       this.form.description = this.description;
@@ -276,7 +249,16 @@ export default {
     },
     gotoUser(username) {
       this.$router.push("/personPage/" + username);
+    },
+    openDraw(num) {
+      this.drawer = true;
+      this.drawerShowType = num;
+      this.showList = num === 0 ? this.fansList : this.followingList;
+    },
+    changePostList(num) {
+      this.postShowType = num;
     }
+
   },
   computed: {
     totalPage() {
@@ -294,6 +276,16 @@ export default {
     isFollowed() {
       return this.fansList.some((item) => item.username === this.username);
     },
+    drawerTitle() {
+      return this.drawerShowType === 0 ? "粉丝列表" : "关注列表";
+    },
+    showList() {
+      return this.drawerShowType === 0 ? this.fansList : this.followingList;
+    },
+    showPostList() {
+      return this.postShowType === 0 ? this.myPostList : this.myCollectPostList;
+    }
+
   },
   mounted() {
     this.username = this.$route.params.username;
@@ -329,19 +321,25 @@ export default {
 
 <style scoped>
 .common-layout {
-  min-height: 100vh;
+  height: 100vh;
+
   background-color: #f5f5f5;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  /* Firefox 隐藏滚动条 */
+  -ms-overflow-style: none;
+  /* IE/Edge 隐藏滚动条 */
+
+
 }
 
 .el-container {
-  max-width: 1200px;
+  width: calc(100vw - 200px);
   margin: 0 auto;
-  overflow: auto;
-  max-height: 88vh;
 }
-.main-container {
-  margin: 0 200px;
-}
+
+
 
 .el-aside {
   background-color: #ffffff;
@@ -390,26 +388,46 @@ export default {
 }
 
 .el-header {
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   border-top-right-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   padding: 20px;
   margin-bottom: 20px;
   align-items: center;
 }
 
+/* .drawer-wrap{
+  
+
+} */
+#showedList {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
 .user-info {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+
 }
+
+.info-btn {
+  margin-left: 30px;
+}
+
 .user-description {
   font-size: 14px;
   color: #999;
   margin-top: 4px;
-  max-width: 400px; /* Limit the width of the description */
-  line-height: 1.5; /* Improve readability */
-  white-space: normal; /* Allow text to wrap */
+  max-width: 400px;
+  /* Limit the width of the description */
+  line-height: 1.5;
+  /* Improve readability */
+  white-space: normal;
+  /* Allow text to wrap */
 }
 
 .user-info .el-avatar {
@@ -429,96 +447,81 @@ export default {
   margin: 4px 0 0;
 }
 
+.fan-follow-wrap {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  flex-direction: row;
+}
+
+.fan-follow-wrap-item {
+  margin-right: 5px;
+}
+
+.fan-follow-wrap-item .count {
+  font-weight: 500;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.fan-follow-wrap-item .show {
+  color: #aa8d8d;
+  font-size: 14px;
+  line-height: 120%;
+  cursor: pointer;
+}
+
 .el-main {
   background-color: transparent;
   padding: 0;
-  overflow: hidden;
-  max-height: 85vh;
+
+
+  /* max-height: 85vh; */
 }
 
-.repo-list {
-  display: flex;
-  flex-direction: column;
-  gap: 19px;
-  margin-bottom: 24px;
+.main-content-wrap {
+  overflow-x: scroll;
+  scrollbar-width: none;
+  /* Firefox 隐藏滚动条 */
+  -ms-overflow-style: none;
+  /* IE/Edge 隐藏滚动条 */
 }
 
-.repo-item {
-  background-color: #ffffff;
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.repo-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.repo-item h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px;
-}
-
-.repo-item p {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-}
-
-.el-pagination {
-  margin-bottom: auto;
+.type-wrap {
   display: flex;
   justify-content: center;
+  position: sticky;
+  top: 60px;
+  /* 当元素到达 top: 0 时固定 */
+  z-index: 100;
+  background-color: #f5f5f5;
   padding: 10px 0;
-  background-color: #ffffff;
-  border-bottom-right-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
-.el-pagination :deep(.el-pager li) {
-  font-size: 14px;
-  margin: 0 4px;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
+.type-wrap .choosen {
+  background-color: rgb(247, 247, 247);
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
 }
 
-.el-pagination :deep(.el-pager li:hover) {
-  background-color: #f0f0f0;
+.type-wrap .btn:hover {
+  background-color: rgb(247, 247, 247);
 }
 
-.el-pagination :deep(.el-pager li.is-active) {
-  background-color: #409eff;
-  color: #ffffff;
+.post-wrap {
+  overflow-x: scroll;
+
+  scrollbar-width: none;
+  padding: 16px;
+  min-width: 1000px;
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
 }
 
-.el-pagination :deep(.btn-prev),
-.el-pagination :deep(.btn-next) {
-  font-size: 14px;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.el-pagination :deep(.btn-prev:hover),
-.el-pagination :deep(.btn-next:hover) {
-  background-color: #f0f0f0;
-}
-
-.el-pagination :deep(.el-pagination__jump) {
-  font-size: 14px;
-  margin: 0 8px;
-}
-
-.el-pagination :deep(.el-pagination__total) {
-  font-size: 14px;
-  margin-left: 8px;
-}
 
 .follow-fan-item {
   cursor: pointer;
