@@ -33,12 +33,14 @@ export async function search1Artical() {
     }
 }
 
-export async function searchArtical4Home() {
+export async function searchArtical4Home(id) {
     const url = 'http://8.210.10.16:9200/artical/_search';
 
     const requestBody = {
         query: {
-            "match_all": {}
+            "match": {
+                "id": id
+            }
         },
         size: 1,
     };
@@ -48,11 +50,66 @@ export async function searchArtical4Home() {
                 'Content-Type': 'application/json;charset=UTF-8',
             },
         });
-        return change2home(parseJson(response.data.hits.hits));
+        return change2home(parseJson(response.data.hits.hits))[0];
     } catch (error) {
         console.error('Error while searching artical:', error);
         return null;
     }
+}
+
+export async function searchArticalIds4Home() {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+
+    const requestBody = {
+        query: {
+            "match_all": {}
+        },
+        size: 100,
+    };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return getIds(parseJson(response.data.hits.hits));
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
+export async function searchArticalIdsFromName4Home(userName) {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+
+    const requestBody = {
+        query: {
+            "match": {
+                "userName": userName
+            }
+        },
+        size: 100,
+    };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return getIds(parseJson(response.data.hits.hits));
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
+function getIds(jsons) {
+    let ids = [];
+    for (let json_ of jsons) {
+        ids.push(json_['_source']['id']);
+        
+    }
+    return ids
 }
 
 function change2home(jsons) {

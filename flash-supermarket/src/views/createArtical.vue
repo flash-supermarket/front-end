@@ -72,7 +72,7 @@ import { ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
 import { chooseGoods, fixQuery, goods2ES } from '@/LLM/gpt4create';
-import { insertArtical, search1Artical, searchArtical4Home } from "@/es/createArtical"
+import { insertArtical, search1Artical, searchArtical4Home, searchArticalIdsFromName4Home } from "@/es/createArtical"
 
 interface Item {
     id: number
@@ -112,7 +112,7 @@ const submitLeftList = async () => {
         body: itemList
     }
     // insertArtical(articalBody);
-    console.log(await searchArtical4Home());
+    console.log(await searchArticalIdsFromName4Home('lr1'));
 }
 
 const searchGoods = async (query: string) => {
