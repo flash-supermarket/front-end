@@ -5,9 +5,11 @@ import loginRegister from '../components/loginRegister.vue'
 import personPage from '../components/personPage.vue'
 import createArtical from '@/views/createArtical.vue'
 import repoPage from '../components/repoPage.vue'
+import search from '../components/search.vue'
 //对于需要登录的页面，使用 meta 属性标记
 const routes = [
   { path: '/login', component: loginRegister },
+  { path: '/search', component: search },
   { path: '/', component: home },
   { path: '/create', component: createArtical },
   { path: '/personPage/:username', component: personPage, meta: { requiresAuth: true } },
