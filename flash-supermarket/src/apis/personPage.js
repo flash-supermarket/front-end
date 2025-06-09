@@ -73,3 +73,29 @@ export async function followUser(data){
         throw new Error(`Error following user, status code: ${res.status}`);
     }
 }
+
+export async function getListCollect(userName) {
+    const res = await httpInstance.request({
+        url: '/listStar/${userName}',
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if(res.status === 200) {
+        return res.data;
+    }else throw new Error(`Error fetching user info, status code: ${res.status}`);
+}
+
+export async function getListStar(userName) {
+    const res = await httpInstance.request({
+        url: '/listLike/${userName}',
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if(res.status === 200) {
+        return res.data;
+    }else throw new Error(`Error fetching user info, status code: ${res.status}`);
+}

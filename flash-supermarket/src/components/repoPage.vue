@@ -5,10 +5,24 @@
     <!-- <el-header>Header</el-header> -->
     <el-container class="container">
       <el-aside width="49%" class="left">
-        <el-carousel :interval="5000" arrow="hover" height="680px" indicator-position="outside">
-          <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
+        <el-carousel
+          :interval="5000"
+          arrow="hover"
+          height="680px"
+          indicator-position="outside"
+        >
+          <el-carousel-item
+            v-for="item in itemList"
+            :key="item"
+            class="loop-show"
+          >
             <el-image class="img-show" :src="item.url" fit="contain" />
-            <el-descriptions class="margin-top" :column="2" size="small" :border=true>
+            <el-descriptions
+              class="margin-top"
+              :column="2"
+              size="small"
+              :border="true"
+            >
               <el-descriptions-item>
                 <template #label>
                   <div class="cell-item">
@@ -18,8 +32,9 @@
                     <span>商品名</span>
                   </div>
                 </template>
-                <span style="font-weight: bold;font-size: 16px;">{{ item.name }}</span>
-
+                <span style="font-weight: bold; font-size: 16px">{{
+                  item.name
+                }}</span>
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
@@ -49,27 +64,55 @@
       </el-aside>
       <el-main class="right" width="49%">
         <div class="user-info">
-          <el-avatar size="large" src="" @click="gotoUser(username)" class="info-img" />
-          <div class="info-name">manKobe</div>
-          <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
-            @click="unFollow">已关注</el-button>
-          <el-button v-else type="danger" icon="Plus" @click="followUser" class="info-btn">关注</el-button>
+          <el-avatar
+            size="large"
+            src=""
+            @click="gotoUser(postInfo.name)"
+            class="info-img"
+          />
+          <div class="info-name">{{ postInfo.name }}</div>
+          <el-button
+            v-if="isUser == false && isFollowed == true"
+            type="info"
+            icon="Operation"
+            class="info-btn"
+            @click="unFollow"
+            >已关注</el-button
+          >
+          <el-button
+            v-else
+            type="danger"
+            icon="Plus"
+            @click="followUser"
+            class="info-btn"
+            >关注</el-button
+          >
         </div>
         <div class="user-content">
-          {{ info.content }}
+          {{ postInfo.content }}
         </div>
         <div class="user-option">
           <div class="star-warp">
-            <i class="iconfont" v-if="isStarred == true" style="color: #d32626">&#xe626;</i>
-            <i class="iconfont" v-else>&#xe626;</i>
-            <span class="wrap-item">{{ starNum }}</span>
+            <i
+              class="iconfont"
+              v-if="isStarred == true"
+              style="color: #d32626"
+              @click="cancelStar"
+              >&#xe626;</i
+            >
+            <i class="iconfont" v-else @click="starPost">&#xe626;</i>
+            <span class="wrap-item">{{ postInfo.starNum }}</span>
           </div>
           <div class="collect-wrap">
             <el-icon size="38" class="iconSet">
-              <StarFilled v-if="isCollected == true" class="wrap-item" />
-              <Star v-else class="wrap-item" />
+              <StarFilled
+                v-if="isCollected == true"
+                class="wrap-item"
+                @click="cancelCollect"
+              />
+              <Star v-else class="wrap-item" @click="collectPost" />
             </el-icon>
-            <span>{{ collectNum }}</span>
+            <span>{{ postInfo.collectNum }}</span>
           </div>
         </div>
       </el-main>
@@ -81,13 +124,19 @@
 import { ElMessageBox, ElMessage } from "element-plus";
 import { getUsername } from "@/http/cookie";
 import { searchNGoods } from "@/es/searchGoods";
+import {
+  cancelCollect,
+  collectRepo,
+  cancelStar,
+  starRepo,
+} from "@/apis/repoPage";
+import { getListCollect, getListStar } from "@/apis/personPage";
 export default {
   name: "repoPage",
 
   data() {
     return {
-      test_url:
-        "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+      test_url: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
       itemList: [
         {
           url: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
@@ -96,26 +145,30 @@ export default {
           price: 10,
         },
       ],
-      info: {
+      postInfo: {
+        //帖子的主人的信息
         avatar: "",
         name: "",
         title: "",
         content: "this is a test content",
+        repoId: "",
+        fansList: [],
+        starNum: "12",
+        collectNum: "13",
       },
-      repoId: "",
-      username: "",
-      fansList: [],
-      collectList: [],
-      starList: [],
-      starNum: "12",
-      collectNum: "13",
+      myInfo:{
+        username: "", // 访问者的名字
+        collectList: [],
+        starList: [],
+      },
+      
       iconSize: 20,
     };
   },
   methods: {
     unFollow() {
       ElMessageBox.confirm(
-        `你确定要取消关注 ${this.username} 吗？`,
+        `你确定要取消关注 ${this.postInfo.name} 吗？`,
         "Warning",
         {
           confirmButtonText: "确定",
@@ -125,14 +178,14 @@ export default {
       )
         .then(() => {
           const info = {
-            userName: getUsername(),
-            followName: this.username,
+            userName: this.myInfo.username,
+            followName: this.postInfo.name,
           };
           unFollowUser(info)
             .then((res) => {
               if (res.code === 200) {
                 ElMessage.success("取关成功！");
-                this.fansList = this.fansList.filter(
+                this.postInfo.fansList = this.postInfo.fansList.filter(
                   (item) => item.username !== info.userName
                 );
               } else {
@@ -152,14 +205,14 @@ export default {
     },
     followUser() {
       const info = {
-        userName: getUsername(),
-        followName: this.username,
+        userName: this.myInfo.username,
+        followName: this.postInfo.name,
       };
       followUser(info)
         .then((res) => {
           if (res.code === 200) {
             ElMessage.success("关注成功！");
-            this.fansList.push({
+            this.postInfo.fansList.push({
               username: info.userName,
               avatar_url: getAvatarUrl(),
             });
@@ -179,23 +232,104 @@ export default {
     retBack() {
       this.$router.go(-1);
     },
+    getCollectStarInterface() {
+      const info = {
+        userName: this.myInfo.username,
+        repositoryId: this.postInfo.repoId,
+      };
+      return info;
+    },
+    cancelStar() {
+      const data = this.getCollectStarInterface();
+      cancelStar(data).then((res) => {
+        if (res.code === 200) {
+          this.postInfo.starNum--;
+          this.myInfo.starList = this.myInfo.starList.filter(
+            (item) => item.repositoryId !== data.repositoryId
+          );
+          ElMessage.success("取消点赞成功！");
+        } else {
+          ElMessage.error("取消点赞失败！");
+        }
+      });
+    },
+    starPost() {
+      const data = this.getCollectStarInterface();
+      starRepo(data).then((res) => {
+        if (res.code === 200) {
+          this.postInfo.starNum++;
+          this.myInfo.starList.push(data.repositoryId);
+          ElMessage.success("点赞成功！");
+        } else {
+          ElMessage.error("点赞失败！");
+        }
+      });
+    },
+    cancelCollect() {
+      const data = this.getCollectStarInterface();
+      cancelCollect(data).then((res) => {
+        if (res.code === 200) {
+          this.postInfo.collectNum--;
+          this.myInfo.collectList = this.myInfo.collectList.filter(
+            (item) => item.repositoryId !== data.repositoryId
+          );
+          ElMessage.success("取消收藏成功！");
+        } else {
+          ElMessage.error("取消收藏失败！");
+        }
+      });
+    },
+    collectPost() {
+      const data = this.getCollectStarInterface();
+      collectRepo(data).then((res) => {
+        if (res.code === 200) {
+          this.postInfo.collectNum++;
+          this.myInfo.collectList.push(data.repositoryId);
+          ElMessage.success("收藏成功！");
+        } else {
+          ElMessage.error("收藏失败！");
+        }
+      });
+    },
   },
   computed: {
     isUser() {
-      return getUsername() === this.username;
+      return this.postInfo.name === this.myInfo.username;
     },
     isFollowed() {
-      return this.fansList.some((item) => item.username === this.username);
+      return this.postInfo.fansList.some((item) => item.username === this.myInfo.username);
     },
     isCollected() {
-      return true;
+      return this.myInfo.collectList.includes(this.postInfo.repoId);
     },
     isStarred() {
-      return true;
+      return this.myInfo.starList.includes(this.postInfo.repoId);
     },
-
   },
   mounted() {
+    //myInfo
+    this.myInfo.username = getUsername();
+    getListCollect(this.myInfo.username).then((res) => {
+      if(res.code === 200){
+        const data = res.data;
+        this.myInfo.collectList = data;
+      }else{
+        console.error("Error fetching collect list:", res.message);
+      }
+    });
+    getListStar(this.myInfo.username).then((res) => {
+      if(res.code === 200){
+        const data = res.data;
+        this.myInfo.starList = data;
+      }else{
+        console.error("Error fetching star list:", res.message);
+      }
+    })
+
+    //postInfo
+    this.postInfo.repoId = this.$route.params.repoId;
+    // es to get the whole repoInfo
+
     const num = 2;
     searchNGoods(num)
       .then((res) => {
@@ -204,12 +338,12 @@ export default {
         for (let item of res) {
           const goods = {
             name: item._source.title,
-            description: item._source.description.join(''),
+            description: item._source.description.join(""),
             url: item._source.images[0].large,
             price: item._source.price,
             id: item._id,
-            category: item._source.main_category
-          }
+            category: item._source.main_category,
+          };
           this.itemList.push(goods);
         }
         // console.log(this.itemList)
