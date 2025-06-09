@@ -59,7 +59,8 @@
                             <span style="font-size: 0.75rem; color: #999;">简介：{{ item.description[0] }}</span>
                         </div>
                     </div>
-                    <button @click="addToLeft(item)" style="color: green;">添加</button>
+                    <!-- <button @click="addToLeft(item)" style="color: green;">添加</button> -->
+                    <button @click="submitLeftList()" style="color: green;">添加</button>
                 </div>
             </div>
         </div>
@@ -70,8 +71,8 @@
 import { ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
-import {  } from "@/LLM/gptapi"
 import { chooseGoods, fixQuery, goods2ES } from '@/LLM/gpt4create';
+import { insertArtical, search1Artical } from "@/es/createArtical"
 
 interface Item {
     id: number
@@ -95,6 +96,24 @@ const handleChange = () => {
 
 const leftList = ref<Item[]>([])
 const rightList = ref<Item[]>([])
+
+let mockUserName: string = 'lrl';
+let mockTitle: string = 'test'
+let mockDescription: string = '这是描述，我是你爹';
+let mockArticalId: number = 1;
+
+const submitLeftList = async () => {
+    let itemList = JSON.stringify(leftList.value);
+    let articalBody = {
+        userName: mockUserName,
+        title: mockTitle,
+        description: mockDescription,
+        id: mockArticalId,
+        body: itemList
+    }
+    // insertArtical(articalBody);
+    console.log(await search1Artical());
+}
 
 const searchGoods = async (query: string) => {
     let goods = [];
@@ -179,4 +198,6 @@ const searchLLMGoods = async (query) => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>
