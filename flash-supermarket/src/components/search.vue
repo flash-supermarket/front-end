@@ -18,9 +18,7 @@
                 v-model="value" 
                 :options="options"
                 placeholder="请选择"
-                size=""
-                style="width: 180px; float: right; margin-top:-5px;" />
-                    
+                class="search-select"/>
         </div>
     </div>
 </template>
@@ -81,16 +79,22 @@ onMounted(() => {
 }
 .search-input {
     position: absolute;
-    right: 100px;
+    right: 300px;
     width: min(60%, 600px);
-    height: 40px;
+    height: 35px;
 }
 .search-button {
     position: absolute;
-    right: 50px;
-    width: 50px;
-    height: 40px;
+    right: 250px;
+    width: 35px;
+    height: 35px;
     background-color: #f8b811;
     border-color: #f8b811;
 }
+.search-select {
+    position: absolute;
+    right: 50px;
+    width: 150px;
+}
+
 </style>
