@@ -2,11 +2,11 @@
     <top-bar :opacityValue="1"></top-bar>
     <div style="height: 90%; overflow: auto;">
         <div
-            style="height: 20%; padding: 1rem; border-bottom: 1px solid #ccc; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            style="height: 20%; padding: 1rem; flex-direction: column; ">
             <div
-                style="width: 66%; height: 80%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); resize: none; justify-content: center; align-items: center;">
+                style=" margin-left: 5%; width: 40%; height: 80%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); resize: none; justify-content: center; align-items: center;">
                 <div style="display: flex; justify-content: flex-end; height: 65%;">
-                    <textarea v-model="inputText" placeholder="输入你想要的帖子内容..."
+                    <textarea v-model="inputText" placeholder="让AI帮你撰写帖子..."
                         style="width: 100%; height: 100%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; font-size: 20px; outline: none; "></textarea>
                 </div>
                 <div style="display: flex; justify-content: flex-end;">
@@ -20,7 +20,7 @@
         <!-- Bottom content area (70%) -->
         <div style="height: 70%; display: flex;">
             <!-- Left list (50%) -->
-            <div style="flex: 1; overflow-y: auto; padding: 1rem; border-right: 1px solid #ccc; height: 100%;">
+            <div style="flex: 1; overflow-y: auto; padding: 1rem; height: 100%;">
                 <div v-for="(item, index) in leftList" :key="item.id"
                     style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
                     <div style="display: flex; width: 80%;">
@@ -72,7 +72,7 @@ import { ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
 import { chooseGoods, fixQuery, goods2ES } from '@/LLM/gpt4create';
-import { insertArtical, search1Artical } from "@/es/createArtical"
+import { insertArtical, search1Artical, searchArtical4Home } from "@/es/createArtical"
 
 interface Item {
     id: number
@@ -98,7 +98,7 @@ const leftList = ref<Item[]>([])
 const rightList = ref<Item[]>([])
 
 let mockUserName: string = 'lrl';
-let mockTitle: string = 'test'
+let mockTitle: string = 'test';
 let mockDescription: string = '这是描述，我是你爹';
 let mockArticalId: number = 1;
 
@@ -112,7 +112,7 @@ const submitLeftList = async () => {
         body: itemList
     }
     // insertArtical(articalBody);
-    console.log(await search1Artical());
+    console.log(await searchArtical4Home());
 }
 
 const searchGoods = async (query: string) => {

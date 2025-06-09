@@ -33,6 +33,46 @@ export async function search1Artical() {
     }
 }
 
+export async function searchArtical4Home() {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+
+    const requestBody = {
+        query: {
+            "match_all": {}
+        },
+        size: 1,
+    };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return change2home(parseJson(response.data.hits.hits));
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
+function change2home(jsons) {
+    let rets = []
+    for (let json_ of jsons) {
+        let json = json_['_source'];
+        let images = []
+        for (let body of json['body']) {
+            images.push(body['image']);
+        }
+        let ret = {
+            images: images,
+            authorName: json['userName'],
+            title: json['title'],
+        }
+        rets.push(ret);
+    }
+    return rets
+}
+
 function parseJson(jsons) {
     for (let json_ of jsons) {
         let json = json_['_source'];
