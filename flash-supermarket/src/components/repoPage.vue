@@ -20,8 +20,10 @@
             <el-descriptions
               class="margin-top"
               :column="2"
-              size="small"
+              size="large"
               :border="true"
+              style="width: 100%"
+
             >
               <el-descriptions-item>
                 <template #label>
@@ -131,6 +133,7 @@ import {
   starRepo,
 } from "@/apis/repoPage";
 import { getListCollect, getListStar } from "@/apis/personPage";
+  import {search1Artical} from "@/es/createArtical";
 export default {
   name: "repoPage",
 
@@ -307,6 +310,27 @@ export default {
     },
   },
   mounted() {
+    search1Artical().then((res) => {
+      console.log(res);
+      this.postInfo.name = res._source.userName;
+      this.postInfo.title = res._source.title;
+      this.postInfo.content = res._source.description;
+      this.postInfo.repoId = res._source.id;
+      this.itemList = [];
+      for (let item of res._source.body) {
+          const goods = {
+            name: item.name,
+            description: item.description.join(""),
+            url: item.image,
+            price: item.price,
+            id: item.id,
+            category: item.category,
+          };
+          this.itemList.push(goods);
+        }
+
+
+    });
     //myInfo
     this.myInfo.username = getUsername();
     getListCollect(this.myInfo.username).then((res) => {
@@ -330,27 +354,27 @@ export default {
     this.postInfo.repoId = this.$route.params.repoId;
     // es to get the whole repoInfo
 
-    const num = 2;
-    searchNGoods(num)
-      .then((res) => {
-        console.log(res);
-        this.itemList = [];
-        for (let item of res) {
-          const goods = {
-            name: item._source.title,
-            description: item._source.description.join(""),
-            url: item._source.images[0].large,
-            price: item._source.price,
-            id: item._id,
-            category: item._source.main_category,
-          };
-          this.itemList.push(goods);
-        }
-        // console.log(this.itemList)
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    // const num = 2;
+    // searchNGoods(num)
+    //   .then((res) => {
+    //     console.log(res);
+    //     this.itemList = [];
+    //     for (let item of res) {
+    //       const goods = {
+    //         name: item._source.title,
+    //         description: item._source.description.join(""),
+    //         url: item._source.images[0].large,
+    //         price: item._source.price,
+    //         id: item._id,
+    //         category: item._source.main_category,
+    //       };
+    //       this.itemList.push(goods);
+    //     }
+    //     // console.log(this.itemList)
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching data:", error);
+    //   });
     // const repoId = this.$route.params.repoId;
     // getRepoInfoById(repoId)
     //   .then((res) => {
