@@ -50,11 +50,11 @@
               </div>
               <div class="fan-follow-wrap">
                 <div class="fan-follow-wrap-item">
-                  <span class="count">{{ followNum || 12 }}</span>
+                  <span class="count">{{ followNum  }}</span>
                   <span class="show" @click="openDraw(1)">关注</span>
                 </div>
                 <div class="fan-follow-wrap-item">
-                  <span class="count">{{ fanNum || 13 }}</span>
+                  <span class="count">{{ fanNum  }}</span>
                   <span class="show" @click="openDraw(0)">粉丝</span>
                 </div>
               </div>
@@ -88,8 +88,11 @@
           <div class="main-content-wrap">
 
             <div class="post-wrap">
-
-              <PostCard v-for="(post, i) in showPostList" :key="i" :post="post" />
+              <div class="post-container" v-if="no_Posts==false">
+                <PostCard v-for="(post, i) in showPostList" :key="i" :post="post"/>
+              </div>
+              <div v-else>没有任何帖子</div>
+             
 
 
             </div>
@@ -124,8 +127,8 @@ export default {
     return {
       username: "",
       description: "发撒赖打开附件是老大开发建设狄拉克发生的理发卡塑料袋放进啊十六分螺丝钉咖啡碱啊阿萨的浪费空间受到了开发技术的",
-      avatar_url: avatar,
       password: "",
+      my_avatar: "",
       followingList: [{ avatar_url: "", username: "User1" }, { avatar_url: "", username: "User2" }],
       fansList: [{ avatar_url: "", username: "User2" }, { avatar_url: "", username: "User2" }],
       dialogFormVisible: false,
@@ -140,8 +143,8 @@ export default {
       drawerShowType: 0, //0粉丝，1关注
 
       postShowType: 0, //0自己的文章，1收藏文章
-      myPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
-      myCollectPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
+      myPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+      myCollectPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
     };
   },
   methods: {
@@ -284,16 +287,29 @@ export default {
     },
     showPostList() {
       return this.postShowType === 0 ? this.myPostList : this.myCollectPostList;
+    },
+    fanNum(){
+      return this.fansList.length;
+    },
+    followNum(){
+      return this.followingList.length;
+    },
+    avatar_url(){
+      if(this.my_avatar==""||this.my_avatar==null){
+        return avatar;
+      }else{
+        return this.my_avatar;
+      }
+    },
+    no_Posts(){
+      return this.showPostList.length === 0;
     }
 
   },
   mounted() {
     this.username = this.$route.params.username;
-    // getUserRepos(this.username).then((res) => {
-    //   this.repoList = res.data;
-    // });
-    getUserInfo(this.username)
-      .then((res) => {
+    getUserInfo(this.username).then((res) => {
+        console.log(res);
         if (res.code === 200) {
           const data = res.data;
           this.password = data.passWord;
@@ -315,6 +331,9 @@ export default {
         console.error("Error fetching user information:", error);
         ElMessage.error("An error occurred while fetching user information");
       });
+    
+      //getUserRepos
+      //getUserCollectRepos
   },
 };
 </script>
@@ -485,15 +504,13 @@ export default {
   /* Firefox 隐藏滚动条 */
   -ms-overflow-style: none;
   /* IE/Edge 隐藏滚动条 */
+
 }
 
 .type-wrap {
   display: flex;
   justify-content: center;
-  position: sticky;
-  top: 60px;
   /* 当元素到达 top: 0 时固定 */
-  z-index: 100;
   background-color: #f5f5f5;
   padding: 10px 0;
 }
@@ -514,12 +531,19 @@ export default {
 
   scrollbar-width: none;
   padding: 16px;
-  min-width: 1000px;
+  /* min-width: 1000px; */
   color: #333;
+  /* display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center; */
+}
+.post-container {
+  margin: 0 auto; 
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  justify-content: center;
+  justify-content: center; 
 }
 
 
