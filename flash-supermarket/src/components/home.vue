@@ -1,5 +1,5 @@
 <template>
-    <div class="container" ref="container">
+    <div class="container">
         <topBar :opacity-value="1" style="width: 100%; height: 60px;" />
         <div class="main" :style="{ opacity: bgOpacity }">
             <div class="title">
@@ -150,11 +150,10 @@ const querySearchAsync = async (queryString: string, cb: (arg: any) => void) => 
         : links.value
     cb(results)
 }
-const gotoSearch = (searchType = 'posts') => {
+const gotoSearch = () => {
   router.push({
     path: '/search',
     query: {
-      type: searchType, 
       q: state.value
     }
   });
