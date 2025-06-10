@@ -15,9 +15,6 @@ export async function getUserInfo(userName) {
     const res = await httpInstance.request({
         url: `/info/${userName}`,
         method: 'get',
-        headers: {
-            'Content-Type': 'application/json'
-        }
     });
     if(res.status === 200) {
         return res.data;

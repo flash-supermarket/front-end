@@ -115,7 +115,7 @@ import topBar from "./topBar.vue";
 import { getUsername, getAvatarUrl } from "../http/cookie";
 import { ElMessage } from "element-plus";
 import { ElMessageBox } from "element-plus";
-import avatar from "../assets/avatar.png"
+import default_avatar from "../assets/avatar.png"
 import PostCard from "./post.vue";
 export default {
   name: "personPage",
@@ -212,7 +212,7 @@ export default {
               if (res.code === 200) {
                 ElMessage.success("取关成功！");
                 this.fansList = this.fansList.filter(
-                  (item) => item.username !== info.userName
+                  (item) => item.userName !== info.userName
                 );
               } else {
                 ElMessage.error("取关失败！");
@@ -238,8 +238,8 @@ export default {
         if (res.code === 200) {
           ElMessage.success("关注成功！");
           this.fansList.push({
-            username: info.userName,
-            avatar_url: getAvatarUrl(),
+            userName: info.userName,
+            avatar: "",
           });
         } else {
           ElMessage.error("关注失败！");
@@ -277,7 +277,7 @@ export default {
     },
     // Check if the user is followed by the current user
     isFollowed() {
-      return this.fansList.some((item) => item.username === this.username);
+      return this.fansList.some((item) => item.userName === this.username);
     },
     drawerTitle() {
       return this.drawerShowType === 0 ? "粉丝列表" : "关注列表";
@@ -296,7 +296,7 @@ export default {
     },
     avatar_url(){
       if(this.my_avatar==""||this.my_avatar==null){
-        return avatar;
+        return default_avatar;
       }else{
         return this.my_avatar;
       }
