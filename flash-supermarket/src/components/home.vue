@@ -89,7 +89,7 @@ interface LinkItem {
   link: string
 }
 const recommend_posts = ref<string[]>([])
-const follow_posts = []
+const follow_posts = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 const router = useRouter()
 const links = ref<LinkItem[]>([])
 const state = ref('')
@@ -137,6 +137,7 @@ async function getLinks() {
         { value: 'babel', link: 'https://github.com/babel/babel' },
     ];
 }
+
 const createFilter = (queryString: string) => {
     return (restaurant: LinkItem) => {
         return (
@@ -312,7 +313,7 @@ onMounted(async () => {
   scrollbar-width: none; /* Firefox */
 }
 .tab-content {
-  padding: 16px;
+  padding: 20px;
   min-width: 1000px;
   color: #333;
   display: flex;
