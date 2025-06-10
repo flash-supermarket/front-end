@@ -5,26 +5,10 @@
     <!-- <el-header>Header</el-header> -->
     <el-container class="container">
       <el-aside width="49%" class="left">
-        <el-carousel
-          :interval="5000"
-          arrow="hover"
-          height="680px"
-          indicator-position="outside"
-        >
-          <el-carousel-item
-            v-for="item in itemList"
-            :key="item"
-            class="loop-show"
-          >
+        <el-carousel :interval="5000" arrow="hover" height="680px" indicator-position="outside">
+          <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
             <el-image class="img-show" :src="item.url" fit="contain" />
-            <el-descriptions
-              class="margin-top"
-              :column="2"
-              size="large"
-              :border="true"
-              style="width: 100%"
-
-            >
+            <el-descriptions class="margin-top" :column="2" size="large" :border="true" style="width: 100%">
               <el-descriptions-item>
                 <template #label>
                   <div class="cell-item">
@@ -66,55 +50,27 @@
       </el-aside>
       <el-main class="right" width="49%">
         <div class="user-info">
-          <el-avatar
-            size="large"
-            src=""
-            @click="gotoUser(postInfo.name)"
-            class="info-img"
-          />
+          <el-avatar size="large" :src="true_avatar" @click="gotoUser(postInfo.name)" class="info-img" />
           <div class="info-name">{{ postInfo.name }}</div>
-          <el-button
-            v-if="isUser == false && isFollowed == true"
-            type="info"
-            icon="Operation"
-            class="info-btn"
-            @click="unFollow"
-            >已关注</el-button
-          >
-          <el-button
-            v-else
-            type="danger"
-            icon="Plus"
-            @click="followUser"
-            class="info-btn"
-            >关注</el-button
-          >
+          <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
+            @click="unFollow">已关注</el-button>
+          <el-button v-else type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
         </div>
         <div class="user-content">
           {{ postInfo.content }}
         </div>
         <div class="user-option">
           <div class="star-warp">
-            <i
-              class="iconfont"
-              v-if="isStarred == true"
-              style="color: #d32626"
-              @click="cancelStar"
-              >&#xe626;</i
-            >
+            <i class="iconfont" v-if="isStarred == true" style="color: #d32626" @click="cancelStar">&#xe626;</i>
             <i class="iconfont" v-else @click="starPost">&#xe626;</i>
-            <span class="wrap-item">{{ postInfo.starNum }}</span>
+            <span class="wrap-item">{{ starNum }}</span>
           </div>
           <div class="collect-wrap">
             <el-icon size="38" class="iconSet">
-              <StarFilled
-                v-if="isCollected == true"
-                class="wrap-item"
-                @click="cancelCollect"
-              />
+              <StarFilled v-if="isCollected == true" class="wrap-item" @click="cancelCollect" />
               <Star v-else class="wrap-item" @click="collectPost" />
             </el-icon>
-            <span>{{ postInfo.collectNum }}</span>
+            <span>{{ collectNum }}</span>
           </div>
         </div>
       </el-main>
@@ -124,16 +80,19 @@
 
 <script>
 import { ElMessageBox, ElMessage } from "element-plus";
-import { getUsername } from "@/http/cookie";
+import { getAvatarUrl, getUsername } from "@/http/cookie";
 import { searchNGoods } from "@/es/searchGoods";
 import {
   cancelCollect,
   collectRepo,
   cancelStar,
   starRepo,
+  getListLikeById,
+  getListCollectById
 } from "@/apis/repoPage";
-import { getListCollect, getListStar } from "@/apis/personPage";
-  import {search1Artical} from "@/es/createArtical";
+import {  getUserInfo , followUser, unFollowUser} from "@/apis/personPage";
+import { search1Artical } from "@/es/createArtical";
+import default_avatar from "@/assets/avatar.png";
 export default {
   name: "repoPage",
 
@@ -156,15 +115,13 @@ export default {
         content: "this is a test content",
         repoId: "",
         fansList: [],
-        starNum: "12",
-        collectNum: "13",
+        starPersonList: [],
+        collectPersonList: [],
       },
-      myInfo:{
+      myInfo: {
         username: "", // 访问者的名字
-        collectList: [],
-        starList: [],
       },
-      
+
       iconSize: 20,
     };
   },
@@ -189,7 +146,7 @@ export default {
               if (res.code === 200) {
                 ElMessage.success("取关成功！");
                 this.postInfo.fansList = this.postInfo.fansList.filter(
-                  (item) => item.username !== info.userName
+                  (item) => item.userName !== info.userName
                 );
               } else {
                 ElMessage.error("取关失败！");
@@ -206,18 +163,19 @@ export default {
           return;
         });
     },
-    followUser() {
+    follow() {
       const info = {
         userName: this.myInfo.username,
         followName: this.postInfo.name,
       };
       followUser(info)
         .then((res) => {
+          console.log(res)
           if (res.code === 200) {
             ElMessage.success("关注成功！");
             this.postInfo.fansList.push({
-              username: info.userName,
-              avatar_url: getAvatarUrl(),
+              userName: info.userName,
+              avatar: "",
             });
           } else {
             ElMessage.error("关注失败！");
@@ -235,20 +193,15 @@ export default {
     retBack() {
       this.$router.go(-1);
     },
-    getCollectStarInterface() {
-      const info = {
+    cancelStar() {
+      const data = {
         userName: this.myInfo.username,
         repositoryId: this.postInfo.repoId,
       };
-      return info;
-    },
-    cancelStar() {
-      const data = this.getCollectStarInterface();
       cancelStar(data).then((res) => {
         if (res.code === 200) {
-          this.postInfo.starNum--;
-          this.myInfo.starList = this.myInfo.starList.filter(
-            (item) => item.repositoryId !== data.repositoryId
+          this.postInfo.starPersonList = this.postInfo.starPersonList.filter(
+            (item) => item !== data.userName
           );
           ElMessage.success("取消点赞成功！");
         } else {
@@ -257,11 +210,13 @@ export default {
       });
     },
     starPost() {
-      const data = this.getCollectStarInterface();
+      const data = {
+        userName: this.myInfo.username,
+        repositoryId: this.postInfo.repoId,
+      };
       starRepo(data).then((res) => {
         if (res.code === 200) {
-          this.postInfo.starNum++;
-          this.myInfo.starList.push(data.repositoryId);
+          this.postInfo.starPersonList.push(data.userName);
           ElMessage.success("点赞成功！");
         } else {
           ElMessage.error("点赞失败！");
@@ -269,12 +224,14 @@ export default {
       });
     },
     cancelCollect() {
-      const data = this.getCollectStarInterface();
+      const data = {
+        userName: this.myInfo.username,
+        repositoryId: this.postInfo.repoId,
+      };
       cancelCollect(data).then((res) => {
         if (res.code === 200) {
-          this.postInfo.collectNum--;
-          this.myInfo.collectList = this.myInfo.collectList.filter(
-            (item) => item.repositoryId !== data.repositoryId
+          this.postInfo.collectPersonList = this.postInfo.collectPersonList.filter(
+            (item) => item != data.userName
           );
           ElMessage.success("取消收藏成功！");
         } else {
@@ -283,11 +240,13 @@ export default {
       });
     },
     collectPost() {
-      const data = this.getCollectStarInterface();
+      const data = {
+        userName: this.myInfo.username,
+        repositoryId: this.postInfo.repoId,
+      };
       collectRepo(data).then((res) => {
         if (res.code === 200) {
-          this.postInfo.collectNum++;
-          this.myInfo.collectList.push(data.repositoryId);
+          this.postInfo.collectPersonList.push(data.userName);
           ElMessage.success("收藏成功！");
         } else {
           ElMessage.error("收藏失败！");
@@ -300,92 +259,82 @@ export default {
       return this.postInfo.name === this.myInfo.username;
     },
     isFollowed() {
-      return this.postInfo.fansList.some((item) => item.username === this.myInfo.username);
+      return this.postInfo.fansList.some((item) => item.userName === this.myInfo.username);
     },
     isCollected() {
-      return this.myInfo.collectList.includes(this.postInfo.repoId);
+      return this.postInfo.collectPersonList.includes(this.myInfo.username);
     },
     isStarred() {
-      return this.myInfo.starList.includes(this.postInfo.repoId);
+      return this.postInfo.starPersonList.includes(this.myInfo.username);
     },
+    starNum(){
+      return this.postInfo.starPersonList.length;
+    },
+    collectNum(){
+      return this.postInfo.collectPersonList.length;
+    },
+    true_avatar(){
+      if(this.postInfo.avatar === ""|| this.postInfo.avatar === null){
+        return default_avatar;
+      }else return this.postInfo.avatar;
+    }
   },
   mounted() {
-    search1Artical().then((res) => {
+    //postInfo
+    this.postInfo.repoId = parseInt(this.$route.params.repoId);
+    console.log(this.postInfo.repoId);
+    search1Artical(this.postInfo.repoId).then((res) => {
       console.log(res);
       this.postInfo.name = res._source.userName;
       this.postInfo.title = res._source.title;
       this.postInfo.content = res._source.description;
-      this.postInfo.repoId = res._source.id;
       this.itemList = [];
       for (let item of res._source.body) {
-          const goods = {
-            name: item.name,
-            description: item.description.join(""),
-            url: item.image,
-            price: item.price,
-            id: item.id,
-            category: item.category,
-          };
-          this.itemList.push(goods);
-        }
+        const goods = {
+          name: item.name,
+          description: item.description.join(""),
+          url: item.image,
+          price: item.price,
+          id: item.id,
+          category: item.category,
+        };
+        this.itemList.push(goods);
 
-
-    });
-    //myInfo
-    this.myInfo.username = getUsername();
-    getListCollect(this.myInfo.username).then((res) => {
-      if(res.code === 200){
+        getUserInfo(this.postInfo.name).then((res) => {
+      if (res.code === 200) {
         const data = res.data;
-        this.myInfo.collectList = data;
-      }else{
-        console.error("Error fetching collect list:", res.message);
-      }
-    });
-    getListStar(this.myInfo.username).then((res) => {
-      if(res.code === 200){
-        const data = res.data;
-        this.myInfo.starList = data;
-      }else{
-        console.error("Error fetching star list:", res.message);
+        this.postInfo.avatar = data.avatar;
+        this.postInfo.fansList = data.fans;
+        console.log(this.postInfo.fansList);
+      } else {
+        ElMessage.error("Failed to fetch user information");
+        console.log(res);
       }
     })
-
-    //postInfo
-    this.postInfo.repoId = this.$route.params.repoId;
-    // es to get the whole repoInfo
-
-    // const num = 2;
-    // searchNGoods(num)
-    //   .then((res) => {
-    //     console.log(res);
-    //     this.itemList = [];
-    //     for (let item of res) {
-    //       const goods = {
-    //         name: item._source.title,
-    //         description: item._source.description.join(""),
-    //         url: item._source.images[0].large,
-    //         price: item._source.price,
-    //         id: item._id,
-    //         category: item._source.main_category,
-    //       };
-    //       this.itemList.push(goods);
-    //     }
-    //     // console.log(this.itemList)
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching data:", error);
-    //   });
-    // const repoId = this.$route.params.repoId;
-    // getRepoInfoById(repoId)
-    //   .then((res) => {
-    //     if (res.code === 200) {
-    //       this.info = res.data[0];
-    //       this.username = this.info.name
-    //     }
-    // })
-    //   .catch((error) => {
-    //     console.error("Error fetching data:", error);
-    //   });
+      .catch((error) => {
+        console.error("Error fetching user information:", error);
+        ElMessage.error("An error occurred while fetching user information");
+      });
+      }
+    });
+    //postInfo.fansList,  postInfo.starList, postInfo.collectList, postInfo.avatar
+    
+    getListLikeById(this.postInfo.repoId).then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        this.postInfo.starPersonList = res.data;
+        // console.log(this.postInfo.starPersonList);
+      }
+    })
+    //getListCollectById
+    getListCollectById(this.postInfo.repoId).then((res) => {
+      if(res.code === 200){
+        this.postInfo.collectPersonList = res.data;
+      }
+    })
+    //myInfo
+    this.myInfo.username = getUsername();
+    console.log("my name:", this.myInfo.username)
   },
 };
 </script>

@@ -11,14 +11,16 @@ export async function insertArtical(articalBody) {
   }
 }
 
-export async function search1Artical() {
+export async function search1Artical(id) {
     const url = 'http://8.210.10.16:9200/artical/_search';
 
     const requestBody = {
         query: {
-            "match_all": {}
-        },
-        size: 1,
+            // "match_all": {}
+            "term": {
+                "id": id
+            }
+        }
     };
     try {
         const response = await axios.post(url, requestBody, {
