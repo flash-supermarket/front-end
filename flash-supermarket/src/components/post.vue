@@ -44,42 +44,51 @@
   </template>
   
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ElAvatar, ElCarousel, ElCarouselItem } from 'element-plus'
+import { searchArtical4Home } from "@/es/createArtical"
 import heart from '../assets/heart.svg'
 import avatar from '../assets/avatar.png'
 import 'element-plus/es/components/avatar/style/css'
 import 'element-plus/es/components/carousel/style/css'
 import 'element-plus/es/components/carousel-item/style/css'
-
 const props = defineProps({
     post: {
         type: String,
         required: true
     }
 })
-
-const DEFAULT_IMGS = ['https://m.media-amazon.com/images/I/51tOc1LyXzL._AC_.jpg', 'https://m.media-amazon.com/images/I/41mGlnnob6L._AC_.jpg']
+const resp = ref({})
+const DEFAULT_IMGS = []
 const DEFAULT_AVATAR = avatar
-const DEFAULT_TITLE = '您的家装必备小清单'
-const DEFAULT_USERNAME = '家装高手'
+const DEFAULT_TITLE = '无标题'
+const DEFAULT_USERNAME = '匿名用户'
 const DEFAULT_LIKES = 0
 const validImages = computed(() => {
-    const imgs = props.post?.images
+    const imgs = resp.value.images
     return Array.isArray(imgs) && imgs.length > 0 ? imgs : DEFAULT_IMGS
 })
 const validAvatar = computed(() => {
-    return props.post?.avatar || DEFAULT_AVATAR
+    return DEFAULT_AVATAR
 })
 const validTitle = computed(() => {
-    return props.post?.title || DEFAULT_TITLE
+    return resp.value.title || DEFAULT_TITLE
 }) 
 const validUsername = computed(() => {
-    return props.post?.username || DEFAULT_USERNAME
+    return resp.value.authorName || DEFAULT_USERNAME
 })
 const validLikes = computed(() => {
     const likes = props.post?.likes
     return typeof likes === 'number' ? likes : DEFAULT_LIKES
+})
+onMounted(async () => {
+  try {
+      const res = await searchArtical4Home(props.post);
+      console.log('获取数据成功:', props.post, res) 
+      resp.value = res;
+    } catch (error) {
+      console.error('获取数据失败:', error)
+    }
 })
 </script>
 

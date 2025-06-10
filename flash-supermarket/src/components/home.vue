@@ -53,7 +53,7 @@
               <el-tab-pane label="推荐内容" name="default">
                 <div class="tab-scroll">
                   <div class="tab-content">
-                    <PostCard v-for="(post, i) in recommend_posts" :key="i" :post="post" />
+                    <PostCard v-for="(post, i) in recommend_posts.slice(0, 9)" :key="i" :post="post" />
                   </div>
                 </div>
               </el-tab-pane>
@@ -78,6 +78,7 @@ import { onMounted, ref, defineComponent } from 'vue'
 import { useRouter } from 'vue-router';
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
+import { searchArticalIds4Home } from "@/es/createArtical"
 defineComponent({
     components: {
         topBar
@@ -87,8 +88,8 @@ interface LinkItem {
   value: string
   link: string
 }
-const recommend_posts = ["P1","P2","P3","P4","P5","P6","P7","P8","P9"]
-const follow_posts = ["P1","P2","P3","P4","P5","P6","P7","P8","P9"]
+const recommend_posts = ref<string[]>([])
+const follow_posts = []
 const router = useRouter()
 const links = ref<LinkItem[]>([])
 const state = ref('')
@@ -162,8 +163,14 @@ const handleSelect = (item: Record<string, any>) => {
     console.log(item)
 }
 
-onMounted(() => {
-  if (container.value) { container.value.addEventListener('scroll', handleScroll); }
+onMounted(async () => {
+    if (container.value) { container.value.addEventListener('scroll', handleScroll); }
+    try {
+      const res = await searchArticalIds4Home();
+      recommend_posts.value = res || []
+    } catch (error) {
+      console.error('获取数据失败:', error)
+    }
 });
 </script>
 
