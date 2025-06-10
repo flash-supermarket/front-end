@@ -44,13 +44,13 @@
           <div class="user-info">
             <el-avatar :src="avatar_url" :size="150" style="margin-right:24px"></el-avatar>
             <div style="max-width: 30%;">
-              <h2 style="font-size: 24px;font-weight: 600;line-height: 120%;">{{ username || "Username" }}</h2>
+              <h2 style="font-size: 24px;font-weight: 600;line-height: 120%;">{{ form.username }}</h2>
               <div class="user-description">
-                {{ description || "No description available" }}
+                {{ form.description }}
               </div>
               <div class="fan-follow-wrap">
                 <div class="fan-follow-wrap-item">
-                  <span class="count">{{ followNum  }}</span>
+                  <span class="count">{{ followNum }}</span>
                   <span class="show" @click="openDraw(1)">关注</span>
                 </div>
                 <div class="fan-follow-wrap-item">
@@ -92,9 +92,6 @@
                 <PostCard v-for="(post, i) in showPostList" :key="i" :post="post"/>
               </div>
               <div v-else>没有任何帖子</div>
-             
-
-
             </div>
           </div>
         </el-main>
@@ -125,7 +122,6 @@ export default {
   },
   data() {
     return {
-      username: "",
       description: "发撒赖打开附件是老大开发建设狄拉克发生的理发卡塑料袋放进啊十六分螺丝钉咖啡碱啊阿萨的浪费空间受到了开发技术的",
       password: "",
       my_avatar: "",
@@ -141,7 +137,6 @@ export default {
       },
       drawer: false,
       drawerShowType: 0, //0粉丝，1关注
-
       postShowType: 0, //0自己的文章，1收藏文章
       myPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
       myCollectPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
@@ -312,16 +307,14 @@ export default {
         console.log(res);
         if (res.code === 200) {
           const data = res.data;
-          this.password = data.passWord;
-          this.avatar_url = data.avatar;
-          this.description = data.description;
           this.followingList = data.follows;
           this.fansList = data.fans;
-
-          this.form.username = this.username;
-          this.form.description = this.description;
-          this.form.avatar = this.avatar_url;
-          this.form.password = this.password;
+          this.form.username = data.userName;
+          this.form.description = data.description;
+          this.form.avatar = data.avatar;
+          this.form.password = data.passWord;
+          console.log(this.fansList);
+          console.log(this.followingList);
         } else {
           ElMessage.error("Failed to fetch user information");
           console.log(res);
@@ -331,6 +324,7 @@ export default {
         console.error("Error fetching user information:", error);
         ElMessage.error("An error occurred while fetching user information");
       });
+
     
       //getUserRepos
       //getUserCollectRepos

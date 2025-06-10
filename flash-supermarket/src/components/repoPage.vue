@@ -5,9 +5,9 @@
     <!-- <el-header>Header</el-header> -->
     <el-container class="container">
       <el-aside width="49%" class="left">
-        <el-carousel :interval="5000" arrow="hover" height="680px" indicator-position="outside">
+        <el-carousel :interval="5000" arrow="hover" height="720px" indicator-position="none">
           <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
-            <el-image class="img-show" :src="item.url" fit="contain" />
+            <el-image class="img-show" :src="item.url" fit="fill" />
             <el-descriptions class="margin-top" :column="2" size="large" :border="true" style="width: 100%">
               <el-descriptions-item>
                 <template #label>
@@ -18,7 +18,7 @@
                     <span>商品名</span>
                   </div>
                 </template>
-                <span style="font-weight: bold; font-size: 16px">{{
+                <span >{{
                   item.name
                 }}</span>
               </el-descriptions-item>
@@ -42,7 +42,8 @@
                     <span>简介</span>
                   </div>
                 </template>
-                {{ item.description }}
+                {{ item.description.length > 200 ? item.description.substring(0, 200) + "...": item.description }}
+
               </el-descriptions-item>
             </el-descriptions>
           </el-carousel-item>
@@ -277,7 +278,8 @@ export default {
       if(this.postInfo.avatar === ""|| this.postInfo.avatar === null){
         return default_avatar;
       }else return this.postInfo.avatar;
-    }
+    },
+    
   },
   mounted() {
     //postInfo
@@ -385,6 +387,9 @@ export default {
 .right {
   padding: 0;
   overflow: hidden;
+  border-left:#f0f0f0 1px;
+  border-left-style: dashed;
+
 }
 
 .loop-show {
@@ -393,6 +398,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background-color: #ffffff;
 }
 
 .cell-item {
