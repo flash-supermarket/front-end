@@ -16,16 +16,13 @@
         </el-carousel-item>
       </el-carousel>
   
-      <div class="post-title">
+      <div class="post-title" @click="goArticle">
         {{ validTitle }}
       </div>
   
       <div class="post-footer">
-        <el-avatar
-          :src="validAvatar"
-          size="small"
-        />
-        <span class="username">{{ validUsername }}</span>
+        <el-avatar class="useravatar" :src="validAvatar" size="small" @click="goUser"/>
+        <span class="username" @click="goUser">{{ validUsername }}</span>
         <el-button class="like-button" type="text" size="small" icon @click="likeButtonFunc">
           <img v-if="!like_button" :src="heart" style="width: 14px;height: 14px;margin-right: 5px;" />
           <img v-if="like_button" :src="heartfill" style="width: 14px;height: 14px;margin-right: 5px;" />
@@ -60,7 +57,15 @@ const DEFAULT_IMGS = []
 const DEFAULT_AVATAR = avatar
 const DEFAULT_TITLE = '无标题'
 const DEFAULT_USERNAME = '匿名用户'
-const DEFAULT_LIKES = 0
+const goUser = () => {
+  console.log("go user!")
+  const username = resp.value.authorName || DEFAULT_USERNAME;
+  window.location.href = `/person/${username}`;
+}
+const goArticle = () => {
+  console.log("go article!")
+  window.location.href = `/article/${props.post}`;
+}
 const likeButtonFunc = async () => {
   try {
     if (like_button.value) {
@@ -96,8 +101,7 @@ const validUsername = computed(() => {
     return resp.value.authorName || DEFAULT_USERNAME
 })
 const validLikeNumber = computed(() => {
-  // console.log(likeNumber.value)
-  return typeof likeNumber.value === 'number' ? likeNumber.value : 0
+  return typeof likeNumber.value === 'number' ? likeNumber.value : ""
 })
 onMounted(async () => {
   try {
@@ -143,6 +147,7 @@ onMounted(async () => {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    cursor: pointer;
 }
 
 .post-footer {
@@ -158,9 +163,17 @@ onMounted(async () => {
     font-weight: 500;
     color: #333;
     margin-right: auto;
+    cursor: pointer;
 }
 
+.useravatar {
+  cursor: pointer;
+}
 .likes {
     color: #e57373;
+}
+
+.like-button {
+  cursor: pointer;
 }
 </style>
