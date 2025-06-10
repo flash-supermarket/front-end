@@ -52,10 +52,13 @@
       <el-main class="right" width="49%">
         <div class="user-info">
           <el-avatar size="large" :src="true_avatar" @click="gotoUser(postInfo.name)" class="info-img" />
-          <div class="info-name">{{ postInfo.name }}</div>
+          <div class="info-name" style="cursor: pointer;" @click="gotoUser(postInfo.name)">{{ postInfo.name }}</div>
           <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
             @click="unFollow">已关注</el-button>
           <el-button v-else type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
+        </div>
+        <div class="user-title">
+          {{ postInfo.title }}
         </div>
         <div class="user-content">
           {{ postInfo.content }}
@@ -429,14 +432,26 @@ export default {
   flex-wrap: wrap;
   padding: 20px;
 }
-
+.user-title{
+  margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 140%;
+    padding: 0 10px;
+}
 .user-content {
   overflow: hidden;
-  border-top: #afb1b4 solid 1px;
+  /* border-top: #afb1b4 solid 1px; */
 
-  margin: 10px 10px;
-  padding: 10px 0;
+  margin: 5px 10px;
+  padding: 5px 0;
   height: 70%;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-primary-label);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .user-option {

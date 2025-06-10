@@ -28,10 +28,10 @@
           :style="{ 'font-weight': drawerShowType === 1 ? 'bold' : 'normal', 'color': drawerShowType === 1 ? '#FF0000' : '#000000' }"
           @click="openDraw(1)">关注列表</span>
         <div id="showedList">
-          <div v-for="item in showList" :key="item.username"
+          <div v-for="item in showList" :key="item.userName"
             style="display: flex; align-items: center;margin-top: 15px;">
-            <el-avatar :src="item.avatar_url" style="margin-right: 12px"></el-avatar>
-            <span>{{ item.username }}</span>
+            <el-avatar :src="(item.avatar==null || item.avatar=='')?default_avatar:item.avatar" style="margin-right: 12px"></el-avatar>
+            <span style="cursor: pointer;" @click="gotoUser(item.userName)">{{ item.userName }}</span>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@ import {
   getUserInfo,
   editUserInfo,
   unFollowUser,
-  followUser,
+  followUser,getListCollect
 } from "@/apis/personPage.js";
 import topBar from "./topBar.vue";
 import { getUsername, getAvatarUrl } from "../http/cookie";
@@ -114,6 +114,7 @@ import { ElMessage } from "element-plus";
 import { ElMessageBox } from "element-plus";
 import default_avatar from "../assets/avatar.png"
 import PostCard from "./post.vue";
+import { searchArticalIdsFromName } from '@/es/createArtical'
 export default {
   name: "personPage",
   components: {
@@ -122,7 +123,7 @@ export default {
   },
   data() {
     return {
-      description: "发撒赖打开附件是老大开发建设狄拉克发生的理发卡塑料袋放进啊十六分螺丝钉咖啡碱啊阿萨的浪费空间受到了开发技术的",
+      description: "",
       password: "",
       my_avatar: "",
       followingList: [{ avatar_url: "", username: "User1" }, { avatar_url: "", username: "User2" }],
@@ -138,8 +139,9 @@ export default {
       drawer: false,
       drawerShowType: 0, //0粉丝，1关注
       postShowType: 0, //0自己的文章，1收藏文章
-      myPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
-      myCollectPostList: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+      myPostList: [],
+      myCollectPostList: [],
+      default_avatar: default_avatar,
     };
   },
   methods: {
@@ -259,20 +261,12 @@ export default {
 
   },
   computed: {
-    totalPage() {
-      return Math.ceil(this.repoList.length / this.pageSize);
-    },
-    paginatedBoxes() {
-      const startIndex = (this.currentPage - 1) * this.pageSize;
-      const endIndex = startIndex + this.pageSize;
-      return this.repoList.slice(startIndex, endIndex);
-    },
     isOwner() {
-      return getUsername() === this.username;
+      return getUsername() === this.form.username;
     },
     // Check if the user is followed by the current user
     isFollowed() {
-      return this.fansList.some((item) => item.userName === this.username);
+      return this.fansList.some((item) => item.userName === this.form.username);
     },
     drawerTitle() {
       return this.drawerShowType === 0 ? "粉丝列表" : "关注列表";
@@ -302,14 +296,13 @@ export default {
 
   },
   mounted() {
-    this.username = this.$route.params.username;
-    getUserInfo(this.username).then((res) => {
+    this.form.username = this.$route.params.username;
+    getUserInfo(this.form.username).then((res) => {
         console.log(res);
         if (res.code === 200) {
           const data = res.data;
           this.followingList = data.follows;
           this.fansList = data.fans;
-          this.form.username = data.userName;
           this.form.description = data.description;
           this.form.avatar = data.avatar;
           this.form.password = data.passWord;
@@ -324,8 +317,29 @@ export default {
         console.error("Error fetching user information:", error);
         ElMessage.error("An error occurred while fetching user information");
       });
+      //拿自己写的文章的列表
+      searchArticalIdsFromName(this.form.username).then((res) => {
+        console.log(res);
+        this.myPostList = [];
+        for(let article of res){
+          this.myPostList.push(article._source.id);
+        }
+        console.log(this.myPostList);
+      }).catch((error) => {
+        console.error("Error fetching user information:", error);
+        ElMessage.error("An error occurred while fetching user information");
+      });
+      //拿收藏的列表
+      getListCollect(this.form.username).then((res) => {
+        if(res.code===200){
+          this.myCollectPostList = res.data;
+          console.log(this.myCollectPostList);
+        }
+      }).catch((error) => {
+        console.error("Error fetching user information:", error);
+        ElMessage.error("An error occurred while fetching user information");
+      });
 
-    
       //getUserRepos
       //getUserCollectRepos
   },
