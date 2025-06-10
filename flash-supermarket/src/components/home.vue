@@ -53,7 +53,7 @@
               <el-tab-pane label="推荐内容" name="default">
                 <div class="tab-scroll">
                   <div class="tab-content">
-                    <PostCard v-for="(post, i) in recommend_posts.slice(0, 9)" :key="i" :post="post" />
+                    <PostCard v-for="(post, i) in randomReco" :key="i" :post="post" />
                   </div>
                 </div>
               </el-tab-pane>
@@ -66,7 +66,7 @@
               </el-tab-pane>
             </el-tabs>
           </div>
-          <div class="recommend-refreash">
+          <div class="recommend-refreash" @click="refresh">
             点击刷新
           </div>
         </div>
@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, defineComponent } from 'vue'
+import { onMounted, ref, defineComponent, computed, triggerRef } from 'vue'
 import { useRouter } from 'vue-router';
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
@@ -111,6 +111,16 @@ const handleScroll = () => {
     bgOpacity.value = 0
   }
 };
+const refresh = () => {
+  console.log(recommend_posts.value);
+  recommend_posts.value = shuffleArray([...recommend_posts.value]);
+  console.log(recommend_posts.value);
+  triggerRef(recommend_posts)
+  triggerRef(randomReco)
+}
+const randomReco = computed(() => {
+    return recommend_posts.value.slice(0, 9)
+})
 async function getLinks() {
     // let works = [];
     // let tmp;
@@ -163,12 +173,20 @@ const gotoSearch = () => {
 const handleSelect = (item: Record<string, any>) => {
     console.log(item)
 }
+function shuffleArray<T>(array: T[]){
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)); // 随机选取一个索引
+        [array[i], array[j]] = [array[j], array[i]]; // 交换元素
+    }
+    return array
+}
 
 onMounted(async () => {
     if (container.value) { container.value.addEventListener('scroll', handleScroll); }
     try {
       const res = await searchArticalIds4Home();
       recommend_posts.value = res || []
+      recommend_posts.value = shuffleArray(recommend_posts.value);
     } catch (error) {
       console.error('获取数据失败:', error)
     }
