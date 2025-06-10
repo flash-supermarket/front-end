@@ -7,6 +7,7 @@
         arrow="hover"
         indicator-position="none"
         class="post-carousel"
+        @click="goArticle"
       >
         <el-carousel-item
           v-for="(img, i) in validImages"
@@ -133,6 +134,7 @@ onMounted(async () => {
 .post-carousel {
     width: 100%;
     border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
 }
 
 .post-image {
