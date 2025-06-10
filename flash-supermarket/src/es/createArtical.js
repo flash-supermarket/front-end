@@ -46,6 +46,30 @@ export async function search1Artical(id) {
     }
 }
 
+export async function searchArticalIdsFromName(userName) {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+
+    const requestBody = {
+        query: {
+            "match": {
+                "userName": userName
+            }
+        },
+        size: 100,
+    };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return parseJson(response.data.hits.hits);
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
 export async function searchArtical4Home(id) {
     const url = 'http://8.210.10.16:9200/artical/_search';
 
