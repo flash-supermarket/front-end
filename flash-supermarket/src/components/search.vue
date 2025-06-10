@@ -20,17 +20,27 @@
                 placeholder="请选择"
                 class="search-select"/>
         </div>
+        <div class="search-result">
+            <div class="search-container">
+                <div class="tab-scroll">
+                    <div class="tab-content">
+                        <PostCard v-for="(post, i) in search_result" :key="i" :post="post" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { watch, ref, onMounted, defineComponent } from 'vue'
+import { ref, onMounted, defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
 const route = useRoute()
 const router = useRouter()
 const query = ref('')
+const search_result = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 defineComponent({
     components: {
         topBar
@@ -79,22 +89,55 @@ onMounted(() => {
 }
 .search-input {
     position: absolute;
-    right: 300px;
-    width: min(60%, 600px);
-    height: 35px;
+    right: max(5% + 250px, 50% - 275px);
+    width: 40%;
+    height: 32px;
 }
 .search-button {
     position: absolute;
-    right: 250px;
-    width: 35px;
-    height: 35px;
+    right: max(5% + 200px, 50% - 325px);
+    width: 32px;
+    height: 32px;
     background-color: #f8b811;
     border-color: #f8b811;
 }
 .search-select {
     position: absolute;
-    right: 50px;
+    right: max(5%, 50% - 525px);
     width: 150px;
 }
+.search-result {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    min-height: 200px;
+    top: 170px;
+}
 
+.search-container {
+    position: absolute;
+    left: max(5%, 50% - 525px);
+    width: min(calc(90% - 40px), 1010px);
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 970px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+.tab-scroll {
+margin-top: 30px;
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: none; /* Firefox */
+}
+.tab-content {
+  padding: 16px;
+  min-width: 1000px;
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
 </style>

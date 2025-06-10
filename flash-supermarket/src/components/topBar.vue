@@ -59,7 +59,7 @@ import { getUsername, removeCookie } from '@/http/cookie';
 const gotoPerson= () => {
     const username = getUsername();
     console.log("个人主页的用户名", username);
-    router.push("/personPage/" + username);
+    router.push("/person/" + username);
 }
 const quitLogin = () => {
     removeCookie();

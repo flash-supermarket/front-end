@@ -53,3 +53,20 @@ export async function cancelStar(data) {
     else throw new Error("cancel star error");
 }
 
+export async function getListLikeById(repoId){
+    const res =  await httpInstance.request({
+        url: `/listLikeById/${repoId}`,
+        method: "get",
+    });
+    if(res.status === 200) return res.data;
+    else throw new Error("get list like error");
+}
+
+export async function getListCollectById(repoId){
+    const res = await httpInstance.request({
+        url: `/listStarById/${repoId}`,
+        method: "get",
+    });
+    if(res.status === 200) return res.data;
+    else throw new Error("get list collect error");
+}
