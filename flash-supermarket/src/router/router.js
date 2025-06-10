@@ -12,8 +12,8 @@ const routes = [
   { path: '/search', component: search },
   { path: '/', component: home },
   { path: '/create', component: createArtical },
-  { path: '/personPage/:username', component: personPage, meta: { requiresAuth: true } },
-  { path: '/repoPage/:repoId', component: repoPage, meta: { requiresAuth: true } },
+  { path: '/person/:username', component: personPage, meta: { requiresAuth: true } },
+  { path: '/article/:repoId', component: repoPage, meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({

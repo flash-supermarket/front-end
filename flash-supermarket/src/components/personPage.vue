@@ -251,7 +251,7 @@ export default {
       });
     },
     gotoUser(username) {
-      this.$router.push("/personPage/" + username);
+      this.$router.push("/person/" + username);
     },
     openDraw(num) {
       this.drawer = true;

@@ -26,18 +26,10 @@
           size="small"
         />
         <span class="username">{{ validUsername }}</span>
-        <el-button
-          class="like-button"
-          type="text"
-          size="small"
-          icon
-        >
-          <img :src="heart" style="
-            width: 14px;
-            height: 14px;
-            margin-right: 5px;
-          " />
-          <span style="font-size: 14px; color: black">{{ validLikes }}</span>
+        <el-button class="like-button" type="text" size="small" icon @click="likeButtonFunc">
+          <img v-if="!like_button" :src="heart" style="width: 14px;height: 14px;margin-right: 5px;" />
+          <img v-if="like_button" :src="heartfill" style="width: 14px;height: 14px;margin-right: 5px;" />
+          <span style="font-size: 14px; color: black">{{ validLikeNumber }}</span>
         </el-button>
       </div>
     </div>
@@ -46,24 +38,50 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { ElAvatar, ElCarousel, ElCarouselItem } from 'element-plus'
+import { getUsername } from "../http/cookie";
 import { searchArtical4Home } from "@/es/createArtical"
+import { getPostLike, likePost, unlikePost } from "@/apis/post"
 import heart from '../assets/heart.svg'
+import heartfill from '../assets/heart.fill.svg'
 import avatar from '../assets/avatar.png'
 import 'element-plus/es/components/avatar/style/css'
 import 'element-plus/es/components/carousel/style/css'
 import 'element-plus/es/components/carousel-item/style/css'
 const props = defineProps({
     post: {
-        type: String,
+        type: Object,
         required: true
     }
 })
+const like_button = ref(false)
 const resp = ref({})
+const likeNumber = ref(null)
 const DEFAULT_IMGS = []
 const DEFAULT_AVATAR = avatar
 const DEFAULT_TITLE = '无标题'
 const DEFAULT_USERNAME = '匿名用户'
 const DEFAULT_LIKES = 0
+const likeButtonFunc = async () => {
+  try {
+    if (like_button.value) {
+      await unlikePost({
+        "userName": getUsername(),
+        "repositoryId": props.post
+      });
+    } else {
+      await likePost({
+        "userName": getUsername(),
+        "repositoryId": props.post
+      });
+    }
+    const likes = await getPostLike(props.post);
+    likeNumber.value = likes.data.length;
+    const username = await getUsername();
+    like_button.value = likes.data.includes(username);
+  } catch (error) {
+    console.error(like_button.value ? '取消点赞失败:' : '点赞失败:', error);
+  }
+};
 const validImages = computed(() => {
     const imgs = resp.value.images
     return Array.isArray(imgs) && imgs.length > 0 ? imgs : DEFAULT_IMGS
@@ -77,15 +95,18 @@ const validTitle = computed(() => {
 const validUsername = computed(() => {
     return resp.value.authorName || DEFAULT_USERNAME
 })
-const validLikes = computed(() => {
-    const likes = props.post?.likes
-    return typeof likes === 'number' ? likes : DEFAULT_LIKES
+const validLikeNumber = computed(() => {
+  // console.log(likeNumber.value)
+  return typeof likeNumber.value === 'number' ? likeNumber.value : 0
 })
 onMounted(async () => {
   try {
-      const res = await searchArtical4Home(props.post);
-      console.log('获取数据成功:', props.post, res) 
-      resp.value = res;
+      const articles = await searchArtical4Home(props.post);
+      resp.value = articles;
+      const likes = await getPostLike(props.post);
+      likeNumber.value = likes.data.length;
+      const username = getUsername();
+      like_button.value = likes.data.includes(username);
     } catch (error) {
       console.error('获取数据失败:', error)
     }

@@ -230,7 +230,7 @@ export default {
         });
     },
     gotoUser(username) {
-      this.$router.push("/personPage/" + username);
+      this.$router.push("/person/" + username);
     },
     retBack() {
       this.$router.go(-1);
