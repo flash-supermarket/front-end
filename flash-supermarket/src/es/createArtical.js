@@ -1,14 +1,25 @@
 import axios from 'axios';
 
+export async function getArticalNum() {
+    try {
+        const countResponse = await axios.get(`http://8.210.10.16:9200/artical/_count`);
+        return countResponse.data.count;
+    } catch (error) {
+        console.error('Error inserting Artical:', error.response?.data || error.message);
+    }
+}
+
 export async function insertArtical(articalBody) {
-  try {
-    await axios.post(
-      'http://8.210.10.16:9200/artical/_doc', // 索引名 + _doc + 文档ID（可省略）
-      articalBody
-    );
-  } catch (error) {
-    console.error('Error inserting Artical:', error.response?.data || error.message);
-  }
+    try {
+        await axios.post(
+            'http://8.210.10.16:9200/artical/_doc', // 索引名 + _doc + 文档ID（可省略）
+            articalBody
+        );
+        return true;
+    } catch (error) {
+        console.error('Error inserting Artical:', error.response?.data || error.message);
+        return false;
+    }
 }
 
 export async function search1Artical() {
@@ -107,7 +118,7 @@ function getIds(jsons) {
     let ids = [];
     for (let json_ of jsons) {
         ids.push(json_['_source']['id']);
-        
+
     }
     return ids
 }
