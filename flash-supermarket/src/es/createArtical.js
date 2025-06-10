@@ -1,14 +1,25 @@
 import axios from 'axios';
 
+export async function getArticalNum() {
+    try {
+        const countResponse = await axios.get(`http://8.210.10.16:9200/artical/_count`);
+        return countResponse.data.count;
+    } catch (error) {
+        console.error('Error inserting Artical:', error.response?.data || error.message);
+    }
+}
+
 export async function insertArtical(articalBody) {
-  try {
-    await axios.post(
-      'http://8.210.10.16:9200/artical/_doc', // 索引名 + _doc + 文档ID（可省略）
-      articalBody
-    );
-  } catch (error) {
-    console.error('Error inserting Artical:', error.response?.data || error.message);
-  }
+    try {
+        await axios.post(
+            'http://8.210.10.16:9200/artical/_doc', // 索引名 + _doc + 文档ID（可省略）
+            articalBody
+        );
+        return true;
+    } catch (error) {
+        console.error('Error inserting Artical:', error.response?.data || error.message);
+        return false;
+    }
 }
 
 export async function search1Artical(id) {
@@ -29,6 +40,30 @@ export async function search1Artical(id) {
             },
         });
         return parseJson(response.data.hits.hits)[0];
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
+export async function searchArticalIdsFromName(userName) {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+
+    const requestBody = {
+        query: {
+            "match": {
+                "userName": userName
+            }
+        },
+        size: 100,
+    };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return parseJson(response.data.hits.hits);
     } catch (error) {
         console.error('Error while searching artical:', error);
         return null;
@@ -109,7 +144,7 @@ function getIds(jsons) {
     let ids = [];
     for (let json_ of jsons) {
         ids.push(json_['_source']['id']);
-        
+
     }
     return ids
 }
