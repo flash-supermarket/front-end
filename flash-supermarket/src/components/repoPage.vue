@@ -55,7 +55,7 @@
           <div class="info-name" style="cursor: pointer;" @click="gotoUser(postInfo.name)">{{ postInfo.name }}</div>
           <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
             @click="unFollow">已关注</el-button>
-          <el-button v-else type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
+          <el-button v-else-if="isUser==false && isFollowed==false" type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
         </div>
         <div class="user-title">
           {{ postInfo.title }}
@@ -73,7 +73,7 @@
             <el-icon size="38" class="iconSet" v-if="isCollected == true">
               <StarFilled  class="wrap-item" @click="cancelCollect" />
             </el-icon>
-            <el-icon size="38" class="iconSet" color="#000000" v-else>
+            <el-icon size="38" class="iconSet" style="color:#453e3e;" v-else>
               <Star class="wrap-item" @click="collectPost" />
             </el-icon>
             <span class="wrap-item">{{ collectNum }}</span>
