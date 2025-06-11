@@ -24,6 +24,7 @@ export async function insertArtical(articalBody) {
 
 export async function alterArticle(articalBody){
     try {
+        articalBody = json2string(articalBody);
         const deleteUrl = 'http://8.210.10.16:9200/artical/_delete_by_query';
 
         const deleteBody = {
@@ -241,4 +242,11 @@ function parseJson(jsons) {
         }
     }
     return jsons;
+}
+
+function json2string(json) {
+    for (const k in json) {
+        json[k] = JSON.stringify(json[k]);
+    }
+    return json;
 }
