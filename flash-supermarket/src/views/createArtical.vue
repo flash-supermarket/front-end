@@ -102,7 +102,7 @@ import { onMounted, ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
 import { chooseGoods, fixQuery, goods2ES, generateTitleAndDes } from '@/LLM/gpt4create';
-import { alterArtical, getArticalNum, insertArtical } from "@/es/createArtical"
+import { alterArticle, getArticalNum, insertArtical } from "@/es/createArtical"
 import { Plus, Minus, Top, Bottom, Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus'
 import { getUsername } from '@/http/cookie'
@@ -211,7 +211,7 @@ const submitLeftList = async () => {
             id: repoId.value,
             body: itemList
         }
-        if (await alterArtical(articalBody)) {
+        if (await alterArticle(articalBody)) {
             ElMessage({
                 showClose: true,
                 message: '编辑成功',

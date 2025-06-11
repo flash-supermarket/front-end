@@ -22,7 +22,7 @@ export async function insertArtical(articalBody) {
     }
 }
 
-export async function alterArtical(articalBody){
+export async function alterArticle(articalBody){
     try {
 
         return true;
