@@ -34,7 +34,7 @@
   </template>
   
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { ElAvatar, ElCarousel, ElCarouselItem } from 'element-plus'
 import { getUsername } from "../http/cookie";
 import { searchArtical4Home } from "@/es/createArtical"
@@ -58,13 +58,29 @@ const DEFAULT_IMGS = []
 const DEFAULT_AVATAR = avatar
 const DEFAULT_TITLE = '无标题'
 const DEFAULT_USERNAME = '匿名用户'
+watch(
+  () => props.post, // 监听 post 的变化
+  async (newPost) => {
+    try {
+      const articles = await searchArtical4Home(newPost);
+      resp.value = articles;
+      const likes = await getPostLike(newPost);
+      likeNumber.value = likes.data.length;
+      const username = getUsername();
+      like_button.value = likes.data.includes(username);
+    } catch (error) {
+      console.error('获取数据失败:', error);
+    }
+  },
+  { immediate: true } // 初次也执行一次（等价于 onMounted）
+)
+
 const goUser = () => {
   console.log("go user!")
   const username = resp.value.authorName || DEFAULT_USERNAME;
   window.location.href = `/person/${username}`;
 }
 const goArticle = () => {
-  console.log("go article!")
   window.location.href = `/article/${props.post}`;
 }
 const likeButtonFunc = async () => {

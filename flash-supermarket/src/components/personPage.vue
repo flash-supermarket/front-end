@@ -88,10 +88,16 @@
           <div class="main-content-wrap">
 
             <div class="post-wrap">
-              <div class="post-container" v-if="no_Posts==false">
-                <PostCard v-for="(post, i) in showPostList" :key="i" :post="post"/>
+              <div class="post-container" v-if="postShowType==0 && no_Posts==false ">
+                <PostCard v-for="(post, i) in myPostList" :key="i" :post="post"/>
               </div>
-              <div v-else>没有任何帖子</div>
+              <div v-else-if="postShowType==0 && no_Posts==true">没有任何帖子</div>
+
+              <div class="post-container" v-if="postShowType==1 && no_Posts==false ">
+                <PostCard v-for="(post, i) in myCollectPostList" :key="i" :post="post"/>
+              </div>
+              <div v-else-if="postShowType==1 && no_Posts==true">没有任何帖子</div>
+
             </div>
           </div>
         </el-main>
@@ -142,6 +148,7 @@ export default {
       myPostList: [],
       myCollectPostList: [],
       default_avatar: default_avatar,
+      visitorName:"",
     };
   },
   methods: {
@@ -162,7 +169,7 @@ export default {
         this.dialogFormVisible = false;
       } else {
         const newInfo = {
-          userName: this.username,
+          userName: this.form.username,
           passWord: this.form.password,
           description: this.form.description,
           avatar: this.avatar_url,
@@ -191,7 +198,7 @@ export default {
     },
     unFollow() {
       ElMessageBox.confirm(
-        `你确定要取消关注 ${this.username} 吗？`,
+        `你确定要取消关注 ${this.form.username} 吗？`,
         "Warning",
         {
           confirmButtonText: "确定",
@@ -201,8 +208,8 @@ export default {
       )
         .then(() => {
           const info = {
-            userName: getUsername(),
-            followName: this.username,
+            userName: this.visitorName,
+            followName: this.form.username,
           };
           unFollowUser(info)
             .then((res) => {
@@ -228,8 +235,8 @@ export default {
     },
     followUser() {
       const info = {
-        userName: getUsername(),
-        followName: this.username,
+        userName: this.visitorName,
+        followName: this.form.username,
       }
       followUser(info).then((res) => {
         if (res.code === 200) {
@@ -258,16 +265,17 @@ export default {
     },
     changePostList(num) {
       this.postShowType = num;
+      console.log(this.showPostList)
     }
 
   },
   computed: {
     isOwner() {
-      return getUsername() === this.form.username;
+      return this.visitorName === this.form.username;
     },
-    // Check if the user is followed by the current user
+    // Check if the visitor is followed by the current user
     isFollowed() {
-      return this.fansList.some((item) => item.userName === this.form.username);
+      return this.fansList.some((item) => item.userName === this.visitorName);
     },
     drawerTitle() {
       return this.drawerShowType === 0 ? "粉丝列表" : "关注列表";
@@ -341,7 +349,8 @@ export default {
         console.error("Error fetching user information:", error);
         ElMessage.error("An error occurred while fetching user information");
       });
-
+      
+      this.visitorName = getUsername();
       //getUserRepos
       //getUserCollectRepos
   },
