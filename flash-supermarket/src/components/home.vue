@@ -60,7 +60,7 @@
               <el-tab-pane label="关注的人" name="following">
                 <div class="tab-scroll">
                   <div class="tab-content">
-                    <PostCard v-for="post in follow_posts" :key="post" :post="post" />
+                    <PostCard v-for="post in randomFollow" :key="post" :post="post" />
                   </div>
                 </div>
               </el-tab-pane>
@@ -74,11 +74,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, defineComponent, computed, triggerRef } from 'vue'
+import { onMounted, ref, defineComponent, computed, triggerRef, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
-import { searchArticalIds4Home } from "@/es/createArtical"
+import { searchArticalIds4Home, searchArticalIdsFromName } from "@/es/createArtical"
+import { getIsLogin, getUsername } from "@/http/cookie"
+import { getUserInfo } from "@/apis/personPage"
 defineComponent({
     components: {
         topBar
@@ -89,7 +91,7 @@ interface LinkItem {
   link: string
 }
 const recommend_posts = ref<string[]>([])
-const follow_posts = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+const follow_posts = ref<string[]>([])
 const router = useRouter()
 const links = ref<LinkItem[]>([])
 const state = ref('')
@@ -97,6 +99,36 @@ const bgOpacity = ref(1)
 const container = ref(null)
 const autocompleteRef = ref(null)
 const activeTab = ref('default')
+watch(activeTab, async (newVal, oldVal) => { // ✅ 外部函数是 async
+  if (newVal === "following" && !getIsLogin()) {
+    activeTab.value = oldVal;
+    router.push("/login");
+    return;
+  }
+  if (newVal === "following") {
+    // try {
+    //   const res = await getUserInfo(getUsername());
+    //   follow_posts.value = []
+    //   if (res.code === 200 && Array.isArray(res.data.follows)) {
+    //     for (const person of res.data.follows) {
+    //       try {
+    //         const result = await searchArticalIdsFromName(person.userName); // ✅ 现在 await 没问题
+    //         const ids = result.map(item => item._source?.id);
+    //         follow_posts.value.push(...ids);
+    //       } catch (err) {
+    //         console.error(`查询用户 ${person.userName} 的文章失败:`, err);
+    //       }
+    //     }
+    //   } else {
+    //     console.error('获取关注列表失败:', res.message);
+    //   }
+    // } catch (error) {
+    //   console.error('获取用户信息失败:', error);
+    // }
+    // console.log("查询关注的文章:", follow_posts.value);
+  }
+});
+
 const handleScroll = () => {
   const scrollTop = container.value.scrollTop;
   const clientHeight = container.value.clientHeight;
@@ -112,14 +144,18 @@ const handleScroll = () => {
   }
 };
 const refresh = () => {
-  console.log(recommend_posts.value);
   recommend_posts.value = shuffleArray([...recommend_posts.value]);
-  console.log(recommend_posts.value);
+  follow_posts.value = shuffleArray([...follow_posts.value]);
   triggerRef(recommend_posts)
   triggerRef(randomReco)
+  triggerRef(follow_posts)
+  triggerRef(randomFollow)
 }
 const randomReco = computed(() => {
     return recommend_posts.value.slice(0, 9)
+})
+const randomFollow = computed(() => {
+    return follow_posts.value.slice(0, 9)
 })
 async function getLinks() {
     // let works = [];
@@ -189,6 +225,28 @@ onMounted(async () => {
       recommend_posts.value = shuffleArray(recommend_posts.value);
     } catch (error) {
       console.error('获取数据失败:', error)
+    }
+    if (getIsLogin()) {
+      try {
+        const res = await getUserInfo(getUsername());
+        follow_posts.value = []
+        if (res.code === 200 && Array.isArray(res.data.follows)) {
+          for (const person of res.data.follows) {
+            try {
+              const result = await searchArticalIdsFromName(person.userName); // ✅ 现在 await 没问题
+              const ids = result.map(item => item._source?.id);
+              follow_posts.value.push(...ids);
+            } catch (err) {
+              console.error(`查询用户 ${person.userName} 的文章失败:`, err);
+            }
+          }
+        } else {
+          console.error('获取关注列表失败:', res.message);
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+      }
+      console.log("查询关注的文章:", follow_posts.value);
     }
 });
 </script>

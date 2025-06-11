@@ -150,6 +150,37 @@ export async function searchArticalIdsFromName4Home(userName) {
     }
 }
 
+export async function searchArticalIdsByQuery(query) {
+    const url = 'http://8.210.10.16:9200/artical/_search';
+    const requestBody = {
+        query: {
+          bool: {
+            must: [
+              {
+                multi_match: {
+                  query: query,
+                  fields: ['title', 'description'],
+                  fuzziness: 'AUTO' // 允许拼写错误模糊匹配
+                }
+              }
+            ]
+          }
+        },
+        size: 9
+      };
+    try {
+        const response = await axios.post(url, requestBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+        return getIds(parseJson(response.data.hits.hits));
+    } catch (error) {
+        console.error('Error while searching artical:', error);
+        return null;
+    }
+}
+
 function getIds(jsons) {
     let ids = [];
     for (let json_ of jsons) {
