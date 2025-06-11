@@ -1,8 +1,7 @@
 <template>
     <top-bar :opacityValue="1"></top-bar>
     <div style="height: 90%; overflow: auto;">
-        <div
-            style="height: 20%; padding: 1rem; flex-direction: column; ">
+        <div style="height: 20%; padding: 1rem; display: flex;">
             <div
                 style=" margin-left: 5%; width: 40%; height: 80%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); resize: none; justify-content: center; align-items: center;">
                 <div style="display: flex; justify-content: flex-end; height: 65%;">
@@ -10,9 +9,19 @@
                         style="width: 100%; height: 100%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; font-size: 20px; outline: none; "></textarea>
                 </div>
                 <div style="display: flex; justify-content: flex-end;">
-                    <button @click="handleSubmit"
-                        style="margin-top: 0.3rem; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background-color: #007bff; color: white; cursor: pointer;">提交</button>
+                    <el-button type="primary" @click="handleSubmit" style="margin-top: 0.3rem;"
+                        :disabled="canAskLLM">提交</el-button>
                 </div>
+            </div>
+            <div style=" margin-left: 5%; width: 45%; height: 80%; align-items: center;">
+                <div>
+
+                </div>
+                <input v-model="titleText" placeholder="标题..."
+                    style="margin-top: 10px;font-size: 30px; font-weight: 700;width: 80%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; outline: none; " />
+                <el-button type="primary" @click="submitLeftList" style="">完成</el-button>
+                <textarea v-model="descriptionText" placeholder="简介..."
+                    style="font-size: 20px; font-weight: 700;width: 100%; height: 60%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; outline: none; "></textarea>
             </div>
         </div>
 
@@ -20,47 +29,68 @@
         <!-- Bottom content area (70%) -->
         <div style="height: 70%; display: flex;">
             <!-- Left list (50%) -->
-            <div style="flex: 1; overflow-y: auto; padding: 1rem; height: 100%;">
+            <div
+                style="flex: 1; overflow-y: auto; padding: 1.3rem; height: 100%; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">
                 <div v-for="(item, index) in leftList" :key="item.id"
-                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
-                    <div style="display: flex; width: 80%;">
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); padding: 2%;">
+                    <div style="display: flex; width: 93%;">
                         <img :src="item.image" alt="item"
-                            style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
-                        <div style="display: flex; flex-direction: column; width: 50%;">
-                            <span style="font-weight: bold;">商品名：{{ item.name }}</span>
-                            <span style="font-size: 0.875rem; color: #666;">价格：{{ item.price }}</span>
-                            <span style="font-size: 0.75rem; color: #999;">简介：{{ item.description[0] }}</span>
+                            style="width: 45%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                        <div style="display: flex; flex-direction: column; width: 50%; margin-left: 5%;">
+                            <span style="font-weight: bold;">商品名：{{ reduceStrLen(item.name, 100) }}</span>
+                            <span style="font-size: 0.875rem; color: #666;margin-top: 3px;">价格：{{ item.price }}</span>
+                            <span style="font-size: 0.75rem; color: #999;margin-top: 3px;">简介：{{
+                                reduceStrLen(item.description.join(''), 380) }}</span>
                         </div>
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <button @click="moveUp(index)" style="color: blue; margin-bottom: 0.25rem;">↑</button>
-                        <button @click="moveDown(index)" style="color: blue; margin-bottom: 0.25rem;">↓</button>
-                        <button @click="removeFromLeft(index)" style="color: red;">删除</button>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <el-button @click="moveUp(index)" type="primary" style="margin-bottom: 0.25rem;" :icon="Top"
+                            circle />
+                        <el-button @click="moveDown(index)" type="primary"
+                            style="margin-bottom: 0.25rem; margin-left: 0px;" :icon="Bottom" circle />
+                        <el-button @click="removeFromLeft(index)" type="danger" style="margin-left: 0px;" :icon="Minus"
+                            circle />
                     </div>
+                </div>
+                <div v-if="leftList.length == 0"
+                    style="width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <img src="../assets/no_result.png" alt="item"
+                        style="width: 40%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                    <span style="font-size: 30px; font-weight: 700;">暂无商品</span>
                 </div>
             </div>
 
             <!-- Right list (50%) -->
-            <div style="flex: 1; padding: 1rem; overflow-y: auto; height: 100%;">
+            <div
+                style="flex: 1; padding: 1.3rem; overflow-y: auto; height: 100%; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
                 <div style="text-align: center; margin-bottom: 1rem; justify-content: center; ">
-                    <input v-model="searchText" type="text" placeholder="搜索..."
-                        style="padding: 0.5rem; border: 1px solid #ccc; outline: none; border-radius: 1rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); width: 66%;" 
-                        @keydown.enter="handleChange"/>
+                    <el-input v-model="searchText" style="max-width: 600px" placeholder="Please input"
+                        class="input-with-select">
+                        <template #append>
+                            <el-button :icon="Search" @click="handleChange" />
+                        </template>
+                    </el-input>
                     <!-- <img src="../assets/icon/search.png" style="width: 30px; margin-top: 30px;" /> -->
                 </div>
                 <div v-for="item in rightList" :key="item.id"
-                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1);">
-                    <div style="display: flex; width: 80%;">
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); padding: 2%;">
+                    <div style="display: flex; width: 93%;">
                         <img :src="item.image" alt="item"
-                            style="width: 50%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
-                        <div style="display: flex; flex-direction: column; width: 50%;">
-                            <span style="font-weight: bold;">商品名：{{ item.name }}</span>
-                            <span style="font-size: 0.875rem; color: #666;">价格：{{ item.price }}</span>
-                            <span style="font-size: 0.75rem; color: #999;">简介：{{ item.description[0] }}</span>
+                            style="width: 45%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                        <div style="display: flex; flex-direction: column; width: 50%; margin-left: 5%;">
+                            <span style="font-weight: bold;">商品名：{{ reduceStrLen(item.name, 100) }}</span>
+                            <span style="font-size: 0.875rem; color: #666; margin-top: 3px;">价格：{{ item.price }}</span>
+                            <span style="font-size: 0.75rem; color: #999; margin-top: 3px;">简介：{{
+                                reduceStrLen(item.description.join(''), 380) }}</span>
                         </div>
                     </div>
-                    <!-- <button @click="addToLeft(item)" style="color: green;">添加</button> -->
-                    <button @click="submitLeftList()" style="color: green;">添加</button>
+                    <el-button @click="addToLeft(item)" type="success" :icon="Plus" circle />
+                </div>
+                <div v-if="rightList.length == 0"
+                    style="width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <img src="../assets/no_result.png" alt="item"
+                        style="width: 40%; height: auto; object-fit: contain; margin-right: 0.5rem;" />
+                    <span style="font-size: 30px; font-weight: 700;">暂无商品</span>
                 </div>
             </div>
         </div>
@@ -71,23 +101,32 @@
 import { ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
-import { chooseGoods, fixQuery, goods2ES } from '@/LLM/gpt4create';
-import { insertArtical, search1Artical, searchArtical4Home, searchArticalIdsFromName4Home } from "@/es/createArtical"
+import { chooseGoods, fixQuery, goods2ES, generateTitleAndDes } from '@/LLM/gpt4create';
+import { getArticalNum, insertArtical } from "@/es/createArtical"
+import { Plus, Minus, Top, Bottom, Search } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus'
+import { getUsername } from '@/http/cookie'
 
 interface Item {
     id: number
     image: string
     name: string
     price: string
-    description: string
+    description: string[]
     category: string
 }
 
+const canAskLLM = ref(false);
+
+const titleText = ref('')
+const descriptionText = ref('')
 const inputText = ref('')
 const searchText = ref('')
 
-const handleSubmit = () => {
-    generateArtical(inputText.value);
+const handleSubmit = async () => {
+    canAskLLM.value = true;
+    await generateArtical(inputText.value);
+    canAskLLM.value = false;
 }
 
 const handleChange = () => {
@@ -97,22 +136,65 @@ const handleChange = () => {
 const leftList = ref<Item[]>([])
 const rightList = ref<Item[]>([])
 
-let mockUserName: string = 'lrl';
-let mockTitle: string = 'test';
-let mockDescription: string = '这是描述，我是你爹';
-let mockArticalId: number = 1;
-
 const submitLeftList = async () => {
-    let itemList = JSON.stringify(leftList.value);
-    let articalBody = {
-        userName: mockUserName,
-        title: mockTitle,
-        description: mockDescription,
-        id: mockArticalId,
-        body: itemList
+    let userName = getUsername();
+    if (typeof userName != 'string' || userName == '') {
+        ElMessage({
+            showClose: true,
+            message: '未登录',
+            type: 'error',
+        })
+        return ;
     }
-    // insertArtical(articalBody);
-    console.log(await searchArticalIdsFromName4Home('lr1'));
+    if (titleText.value == '') {
+        ElMessage({
+            showClose: true,
+            message: '文章标题不能为空',
+            type: 'error',
+        })
+        return ;
+    }
+    if (descriptionText.value == '') {
+        ElMessage({
+            showClose: true,
+            message: '文章简介不能为空',
+            type: 'error',
+        })
+        return ;
+    }
+    if (leftList.value.length == 0) {
+        ElMessage({
+            showClose: true,
+            message: '商品列表不能为空',
+            type: 'error',
+        })
+        return ;
+    }
+
+    let itemList = JSON.stringify(leftList.value);
+    let id = await getArticalNum();
+    if (typeof id == 'number') {
+        let articalBody = {
+            userName: userName,
+            title: titleText.value,
+            description: descriptionText.value,
+            id: id + 1,
+            body: itemList
+        }
+        if (await insertArtical(articalBody)) {
+            ElMessage({
+                showClose: true,
+                message: '创建成功',
+                type: 'success',
+            })
+            return ;
+        }
+    }
+    ElMessage({
+        showClose: true,
+        message: '创建失败，请重试',
+        type: 'error',
+    })
 }
 
 const searchGoods = async (query: string) => {
@@ -140,6 +222,13 @@ const goods2item = (goods): Item => {
         description: goods._source.description,
         category: goods._source.main_category
     }
+}
+
+const reduceStrLen = (str: string, maxLength: number) => {
+    if (str.length <= maxLength) {
+        return str;
+    }
+    return str.substring(0, maxLength) + '...';
 }
 
 const addToLeft = (item: Item) => {
@@ -175,7 +264,7 @@ const generateArtical = async (query: string) => {
         await searchLLMGoods(esQuery);
 
         let find_goods = [];
-        for (let i = 0;i<10 && i < rightList.value.length;i++) {
+        for (let i = 0; i < 10 && i < rightList.value.length; i++) {
             find_goods.push(rightList.value[i].name);
         }
 
@@ -187,6 +276,14 @@ const generateArtical = async (query: string) => {
             leftList.value.push(rightList.value[index]);
         }
     }
+
+    let choosedGoods: string[] = []
+    for (let choosedGood of leftList.value) {
+        choosedGoods.push(choosedGood.name);
+    }
+    let output = await generateTitleAndDes(choosedGoods, query);
+    titleText.value = output['title'];
+    descriptionText.value = output['description'];
 }
 
 const searchLLMGoods = async (query) => {
@@ -198,6 +295,4 @@ const searchLLMGoods = async (query) => {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

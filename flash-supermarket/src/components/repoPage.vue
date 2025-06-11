@@ -5,9 +5,9 @@
     <!-- <el-header>Header</el-header> -->
     <el-container class="container">
       <el-aside width="49%" class="left">
-        <el-carousel :interval="5000" arrow="hover" height="680px" indicator-position="outside">
+        <el-carousel :interval="5000" arrow="hover" height="720px" indicator-position="none">
           <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
-            <el-image class="img-show" :src="item.url" fit="contain" />
+            <el-image class="img-show" :src="item.url" fit="fill" />
             <el-descriptions class="margin-top" :column="2" size="large" :border="true" style="width: 100%">
               <el-descriptions-item>
                 <template #label>
@@ -18,7 +18,7 @@
                     <span>商品名</span>
                   </div>
                 </template>
-                <span style="font-weight: bold; font-size: 16px">{{
+                <span >{{
                   item.name
                 }}</span>
               </el-descriptions-item>
@@ -42,7 +42,8 @@
                     <span>简介</span>
                   </div>
                 </template>
-                {{ item.description }}
+                {{ item.description.length > 200 ? item.description.substring(0, 200) + "...": item.description }}
+
               </el-descriptions-item>
             </el-descriptions>
           </el-carousel-item>
@@ -51,10 +52,13 @@
       <el-main class="right" width="49%">
         <div class="user-info">
           <el-avatar size="large" :src="true_avatar" @click="gotoUser(postInfo.name)" class="info-img" />
-          <div class="info-name">{{ postInfo.name }}</div>
+          <div class="info-name" style="cursor: pointer;" @click="gotoUser(postInfo.name)">{{ postInfo.name }}</div>
           <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
             @click="unFollow">已关注</el-button>
           <el-button v-else type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
+        </div>
+        <div class="user-title">
+          {{ postInfo.title }}
         </div>
         <div class="user-content">
           {{ postInfo.content }}
@@ -277,7 +281,8 @@ export default {
       if(this.postInfo.avatar === ""|| this.postInfo.avatar === null){
         return default_avatar;
       }else return this.postInfo.avatar;
-    }
+    },
+    
   },
   mounted() {
     //postInfo
@@ -385,6 +390,9 @@ export default {
 .right {
   padding: 0;
   overflow: hidden;
+  border-left:#f0f0f0 1px;
+  border-left-style: dashed;
+
 }
 
 .loop-show {
@@ -393,6 +401,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background-color: #ffffff;
 }
 
 .cell-item {
@@ -423,14 +432,26 @@ export default {
   flex-wrap: wrap;
   padding: 20px;
 }
-
+.user-title{
+  margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 140%;
+    padding: 0 10px;
+}
 .user-content {
   overflow: hidden;
-  border-top: #afb1b4 solid 1px;
+  /* border-top: #afb1b4 solid 1px; */
 
-  margin: 10px 10px;
-  padding: 10px 0;
+  margin: 5px 10px;
+  padding: 5px 0;
   height: 70%;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-primary-label);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .user-option {

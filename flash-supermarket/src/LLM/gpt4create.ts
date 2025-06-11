@@ -1,5 +1,5 @@
 import { chatWithGPT } from '@/LLM/gptapi'
-import { chooseGoodsSystem, fixQuerySystem, goods2ESSystem } from '@/LLM/prompts'
+import { chooseGoodsSystem, fixQuerySystem, goods2ESSystem, generateTitleAndDesSystem } from '@/LLM/prompts'
 
 export async function fixQuery(query: string) {
     let reply = await chatWithGPT(fixQuerySystem, query)
@@ -32,5 +32,29 @@ results:
     }
     else {
         return 0;
+    }
+}
+
+export async function generateTitleAndDes(name_list: string[], query: string) {
+    let userPrompt = `用户的要求：
+${query}
+
+用户选择的商品列表：
+`
+    for(let i = 0;i<name_list.length;i++) {
+        userPrompt += `${name_list[i]}\n`
+    }
+    let reply = await chatWithGPT(generateTitleAndDesSystem, userPrompt);
+    let title: string = ''
+    let description: string = ''
+    if (reply['title'] && typeof reply['title'] == 'string') {
+        title = reply['title'];
+    }
+    if (reply['description'] && typeof reply['description'] == 'string') {
+        description = reply['description'];
+    }
+    return {
+        "title": title,
+        "description": description
     }
 }
