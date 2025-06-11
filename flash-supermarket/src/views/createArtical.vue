@@ -98,14 +98,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import topBar from "@/components/topBar.vue";
 import { searchAnyGoods, searchNGoods, searchQueryGoods } from "@/es/searchGoods"
 import { chooseGoods, fixQuery, goods2ES, generateTitleAndDes } from '@/LLM/gpt4create';
-import { getArticalNum, insertArtical } from "@/es/createArtical"
+import { alterArticle, getArticalNum, insertArtical } from "@/es/createArtical"
 import { Plus, Minus, Top, Bottom, Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus'
 import { getUsername } from '@/http/cookie'
+import { useRoute } from 'vue-router';
+import { search1Artical } from '@/es/createArtical'
 
 interface Item {
     id: number
@@ -122,6 +124,10 @@ const titleText = ref('')
 const descriptionText = ref('')
 const inputText = ref('')
 const searchText = ref('')
+const isEdit = ref(false)
+const router = useRoute();
+const repoId = ref(-1)
+
 
 const handleSubmit = async () => {
     canAskLLM.value = true;
@@ -144,7 +150,7 @@ const submitLeftList = async () => {
             message: '未登录',
             type: 'error',
         })
-        return ;
+        return;
     }
     if (titleText.value == '') {
         ElMessage({
@@ -152,7 +158,7 @@ const submitLeftList = async () => {
             message: '文章标题不能为空',
             type: 'error',
         })
-        return ;
+        return;
     }
     if (descriptionText.value == '') {
         ElMessage({
@@ -160,7 +166,7 @@ const submitLeftList = async () => {
             message: '文章简介不能为空',
             type: 'error',
         })
-        return ;
+        return;
     }
     if (leftList.value.length == 0) {
         ElMessage({
@@ -168,33 +174,59 @@ const submitLeftList = async () => {
             message: '商品列表不能为空',
             type: 'error',
         })
-        return ;
+        return;
     }
 
     let itemList = JSON.stringify(leftList.value);
-    let id = await getArticalNum();
-    if (typeof id == 'number') {
+    console.log(isEdit.value);
+    if (isEdit.value == false) {
+        let id = await getArticalNum();
+        if (typeof id == 'number') {
+            let articalBody = {
+                userName: userName,
+                title: titleText.value,
+                description: descriptionText.value,
+                id: id + 1,
+                body: itemList
+            }
+            if (await insertArtical(articalBody)) {
+                ElMessage({
+                    showClose: true,
+                    message: '创建成功',
+                    type: 'success',
+                })
+                return;
+            }
+        }
+        ElMessage({
+            showClose: true,
+            message: '创建失败，请重试',
+            type: 'error',
+        })
+    } else {//编辑问卷
         let articalBody = {
             userName: userName,
             title: titleText.value,
             description: descriptionText.value,
-            id: id + 1,
+            id: repoId.value,
             body: itemList
         }
-        if (await insertArtical(articalBody)) {
+        if (await alterArticle(articalBody)) {
             ElMessage({
                 showClose: true,
-                message: '创建成功',
+                message: '编辑成功',
                 type: 'success',
             })
-            return ;
+            window.location.href = `/article/${repoId.value}`
         }
+        ElMessage({
+            showClose: true,
+            message: '编辑失败，请重试',
+            type: 'error',
+        })
+
     }
-    ElMessage({
-        showClose: true,
-        message: '创建失败，请重试',
-        type: 'error',
-    })
+
 }
 
 const searchGoods = async (query: string) => {
@@ -293,6 +325,23 @@ const searchLLMGoods = async (query) => {
         rightList.value.push(goods2item(good))
     }
 }
+
+onMounted(() => {
+    const param = router.params.repoId
+    repoId.value = param ? parseInt(param as string) : -1
+    console.log(repoId.value)
+    if (repoId.value !== -1) {
+        search1Artical(repoId.value).then(res => {
+            console.log(res);
+            titleText.value = res._source.title;
+            descriptionText.value = res._source.description;
+            leftList.value = res._source.body;
+            isEdit.value = true;
+        })
+    }
+
+})
+
 </script>
 
 <style scoped></style>

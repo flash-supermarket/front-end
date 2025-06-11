@@ -248,8 +248,9 @@ export default {
       });
     },
     gotoUser(username) {
-      this.$router.push("/person/" + username);
+      window.location.href = `/person/${username}`;
     },
+
     openDraw(num) {
       this.drawer = true;
       this.drawerShowType = num;

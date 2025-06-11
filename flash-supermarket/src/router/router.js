@@ -12,6 +12,7 @@ const routes = [
   { path: '/search', component: search },
   { path: '/', component: home },
   { path: '/create', component: createArtical },
+  { path: '/create/:repoId', component: createArtical },
   { path: '/person/:username', component: personPage, meta: { requiresAuth: true } },
   { path: '/article/:repoId', component: repoPage, meta: { requiresAuth: true } },
 ]

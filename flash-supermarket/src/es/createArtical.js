@@ -22,6 +22,16 @@ export async function insertArtical(articalBody) {
     }
 }
 
+export async function alterArticle(articalBody){
+    try {
+
+        return true;
+    } catch (error) {
+        console.error('Error inserting Artical:', error.response?.data || error.message);
+        return false;
+    }
+}
+
 export async function search1Artical(id) {
     const url = 'http://8.210.10.16:9200/artical/_search';
 
