@@ -1,9 +1,10 @@
 <template>
   <div class="background">
-    <el-button class="ret-btn" @click="retBack">返回</el-button>
+    
 
     <!-- <el-header>Header</el-header> -->
-    <el-container class="container">
+    <el-container class="container" style="position: relative;">
+      <el-button class="ret-btn" @click="retBack" style="position: absolute;z-index: 100;top:5px;left:6px;">返回</el-button>
       <el-aside width="49%" class="left">
         <el-carousel :interval="5000" arrow="hover" height="720px" indicator-position="none">
           <el-carousel-item v-for="item in itemList" :key="item" class="loop-show">
@@ -285,7 +286,7 @@ export default {
       return this.postInfo.collectPersonList.length;
     },
     true_avatar(){
-      if(this.postInfo.avatar === ""|| this.postInfo.avatar === null){
+      if(this.postInfo.avatar === ""|| this.postInfo.avatar === null||this.postInfo.avatar === undefined){
         return default_avatar;
       }else return this.postInfo.avatar;
     },
@@ -362,11 +363,11 @@ export default {
   /* 外层背景色 */
 }
 
-.ret-btn {
+/* .ret-btn {
   position: absolute;
   top: 1%;
   left: 92%;
-}
+} */
 
 .container {
   background-color: #ffffff;
