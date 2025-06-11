@@ -72,12 +72,11 @@ export async function followUser(data){
 }
 
 export async function getListCollect(userName) {
+    console.log(userName)
     const res = await httpInstance.request({
-        url: '/listStar/${userName}',
+        url: `/listStar/${userName}`,
         method: 'get',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+       
     });
     if(res.status === 200) {
         return res.data;
@@ -86,7 +85,7 @@ export async function getListCollect(userName) {
 
 export async function getListStar(userName) {
     const res = await httpInstance.request({
-        url: '/listLike/${userName}',
+        url: `/listLike/${userName}`,
         method: 'get',
         headers: {
             'Content-Type': 'application/json'

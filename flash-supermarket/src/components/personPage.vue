@@ -21,12 +21,12 @@
     </el-dialog>
     <el-drawer v-model="drawer" title="I am the title" :with-header="false" direction="ltr" size="200">
       <div class="drawer-wrap">
-        <span style="display: block;cursor: pointer;"
+        <!-- <span style="display: block;cursor: pointer;"
           :style="{ 'font-weight': drawerShowType === 0 ? 'bold' : 'normal', 'color': drawerShowType === 0 ? '#FF0000' : '#000000' }"
           @click="openDraw(0)">粉丝列表</span>
         <span style="display: block;cursor: pointer;"
           :style="{ 'font-weight': drawerShowType === 1 ? 'bold' : 'normal', 'color': drawerShowType === 1 ? '#FF0000' : '#000000' }"
-          @click="openDraw(1)">关注列表</span>
+          @click="openDraw(1)">关注列表</span> -->
         <div id="showedList">
           <div v-for="item in showList" :key="item.userName"
             style="display: flex; align-items: center;margin-top: 15px;">
@@ -331,9 +331,10 @@ export default {
       });
       //拿收藏的列表
       getListCollect(this.form.username).then((res) => {
+        console.log(res);
         if(res.code===200){
           this.myCollectPostList = res.data;
-          console.log(this.myCollectPostList);
+          console.log("1111",this.myCollectPostList);
         }
       }).catch((error) => {
         console.error("Error fetching user information:", error);
