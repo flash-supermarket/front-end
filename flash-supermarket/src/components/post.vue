@@ -17,7 +17,7 @@
         </el-carousel-item>
       </el-carousel>
   
-      <div class="post-title" @click="goArticle">
+      <div class="post-title ellipsis" @click="goArticle">
         {{ validTitle }}
       </div>
   
@@ -177,5 +177,11 @@ onMounted(async () => {
 
 .like-button {
   cursor: pointer;
+}
+
+.ellipsis {
+  white-space: nowrap;          /* 不换行 */
+  overflow: hidden;             /* 超出容器隐藏 */
+  text-overflow: ellipsis;      /* 超出部分用...显示 */
 }
 </style>

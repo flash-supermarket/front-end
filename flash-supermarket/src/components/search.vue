@@ -24,7 +24,7 @@
             <div class="search-container">
                 <div class="tab-scroll">
                     <div class="tab-content">
-                        <PostCard v-for="(post, i) in search_result" :key="i" :post="post" />
+                        <PostCard v-for="post in search_article" :key="post" :post="post" />
                     </div>
                 </div>
             </div>
@@ -33,14 +33,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineComponent } from 'vue'
+import { ref, onMounted, defineComponent, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
+import { searchArticalIdsByQuery } from "@/es/createArtical"
+import { getPostLike } from "@/apis/post"
 const route = useRoute()
 const router = useRouter()
 const query = ref('')
-const search_result = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+const search_result = ref([])
+const search_article = computed(() => search_result.value)
 defineComponent({
     components: {
         topBar
@@ -48,14 +51,43 @@ defineComponent({
 });
 const initials = [
     '按匹配程度递减',
-    '按点赞量递减',
-    '按发表时间递减',
+    '按点赞量递减'
 ]
-const options = Array.from({ length: 3 }).map((_, idx) => ({
+const options = Array.from({ length: 2 }).map((_, idx) => ({
     value: `${idx}`,
-    label: `${initials[idx % 10]}`,
+    label: `${initials[idx]}`,
 }))
 const value = ref(options[0].value);
+watch(value, async (newval, oldval) => {
+  if (oldval !== newval) {
+    if (newval === '0') {
+      try {
+        const res = await searchArticalIdsByQuery(query.value);
+        search_result.value = res;
+      } catch (err) {
+        console.error('Search error:', err);
+      }
+    } 
+    else if (newval === '1') {
+        try {
+        const articles = search_result.value; // number[]
+        const articlesWithLikes = await Promise.all(
+          articles.map(async (id) => {
+            const likeCount = await getPostLike(id);
+            return { id, likeCount: likeCount.data.length };
+          })
+        );
+        articlesWithLikes.sort((a, b) => b.likeCount - a.likeCount);
+        search_result.value = articlesWithLikes.map(item => item.id);
+        console.log('Sorted articles by likes:', articlesWithLikes);
+      } catch (err) {
+        console.error('点赞排序失败:', err);
+      }
+    }
+  }
+});
+
+
 const gotoSearch = () => {
   router.replace({
     path: '/search',
@@ -63,9 +95,19 @@ const gotoSearch = () => {
       q: query.value
     }
   });
+  searchArticalIdsByQuery(query.value).then((res) => {
+    search_result.value = res;
+  }).catch((err) => {
+    console.error('Search error:', err);
+  });
 }
 onMounted(() => {
   query.value = route.query.q || ''
+  searchArticalIdsByQuery(query.value).then((res) => {
+    search_result.value = res;
+  }).catch((err) => {
+    console.error('Search error:', err);
+  });
 })
 </script>
 
