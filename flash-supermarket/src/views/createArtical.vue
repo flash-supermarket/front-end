@@ -14,23 +14,20 @@
                 </div>
             </div>
             <div style=" margin-left: 5%; width: 45%; height: 80%; align-items: center;">
-                <div>
-
-                </div>
                 <input v-model="titleText" placeholder="标题..."
-                    style="margin-top: 10px;font-size: 30px; font-weight: 700;width: 80%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; outline: none; " />
-                <el-button type="primary" @click="submitLeftList" style="">完成</el-button>
+                    style="font-size: 20px; font-weight: 700;width: 75%; padding: 0.5rem;border: 1px solid rgba(0, 0, 0, 0.1); resize: none; outline: none; " />
+                <el-button type="primary" @click="submitLeftList" style="margin-left: 5%;">完成</el-button>
                 <textarea v-model="descriptionText" placeholder="简介..."
-                    style="font-size: 20px; font-weight: 700;width: 100%; height: 60%; padding: 0.5rem; border: 0px silver; border-radius: 1rem; resize: none; outline: none; "></textarea>
+                    style="margin-top: 10px;font-size: 16px; font-weight: 700;width: 100%; height: 60%; padding: 0.5rem;border: 1px solid rgba(0, 0, 0, 0.1); resize: none; outline: none; "></textarea>
             </div>
         </div>
 
 
         <!-- Bottom content area (70%) -->
-        <div style="height: 70%; display: flex;">
+        <div style="height: 70%; display: flex; width: 94%; margin-left: 3%;">
             <!-- Left list (50%) -->
             <div
-                style="flex: 1; overflow-y: auto; padding: 1.3rem; height: 100%; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;">
+                style="flex: 1; overflow-y: auto; padding: 1.3rem; height: 100%; border: 1px solid #ccc; border-radius: 3%; box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);">
                 <div v-for="(item, index) in leftList" :key="item.id"
                     style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border: 1px solid #ccc; padding: 0.5rem; border-radius: 0.5rem; box-shadow: 0 0 4px rgba(0,0,0,0.1); padding: 2%;">
                     <div style="display: flex; width: 93%;">
@@ -61,8 +58,11 @@
             </div>
 
             <!-- Right list (50%) -->
+            <div style="height: 10px; flex: 0.05;">
+
+            </div>
             <div
-                style="flex: 1; padding: 1.3rem; overflow-y: auto; height: 100%; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+                style="flex: 1; padding: 1.3rem; overflow-y: auto; height: 100%; border: 1px solid #ccc; border-radius: 3%; box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);">
                 <div style="text-align: center; margin-bottom: 1rem; justify-content: center; ">
                     <el-input v-model="searchText" style="max-width: 600px" placeholder="Please input"
                         class="input-with-select">
