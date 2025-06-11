@@ -56,6 +56,7 @@
           <el-button v-if="isUser == false && isFollowed == true" type="info" icon="Operation" class="info-btn"
             @click="unFollow">已关注</el-button>
           <el-button v-else-if="isUser==false && isFollowed==false" type="danger" icon="Plus" @click="follow" class="info-btn">关注</el-button>
+          <el-button v-else type="primary" icon="Operation" class="info-btn" @click="editArticle">编辑帖子</el-button>
         </div>
         <div class="user-title">
           {{ postInfo.title }}
@@ -259,6 +260,10 @@ export default {
         }
       });
     },
+    editArticle(){
+      this.$router.push('/create/'+this.postInfo.repoId)
+
+    }
   },
   computed: {
     isUser() {
