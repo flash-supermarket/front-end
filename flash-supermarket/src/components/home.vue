@@ -53,14 +53,14 @@
               <el-tab-pane label="推荐内容" name="default">
                 <div class="tab-scroll">
                   <div class="tab-content">
-                    <PostCard v-for="(post, i) in randomReco" :key="i" :post="post" />
+                    <PostCard v-for="post in randomReco" :key="post" :post="post" />
                   </div>
                 </div>
               </el-tab-pane>
               <el-tab-pane label="关注的人" name="following">
                 <div class="tab-scroll">
                   <div class="tab-content">
-                    <PostCard v-for="(post, i) in follow_posts" :key="i" :post="post" />
+                    <PostCard v-for="post in follow_posts" :key="post" :post="post" />
                   </div>
                 </div>
               </el-tab-pane>
