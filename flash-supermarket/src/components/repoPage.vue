@@ -70,11 +70,13 @@
             <span class="wrap-item">{{ starNum }}</span>
           </div>
           <div class="collect-wrap">
-            <el-icon size="38" class="iconSet">
-              <StarFilled v-if="isCollected == true" class="wrap-item" @click="cancelCollect" />
-              <Star v-else class="wrap-item" @click="collectPost" />
+            <el-icon size="38" class="iconSet" v-if="isCollected == true">
+              <StarFilled  class="wrap-item" @click="cancelCollect" />
             </el-icon>
-            <span>{{ collectNum }}</span>
+            <el-icon size="38" class="iconSet" color="#000000" v-else>
+              <Star class="wrap-item" @click="collectPost" />
+            </el-icon>
+            <span class="wrap-item">{{ collectNum }}</span>
           </div>
         </div>
       </el-main>
@@ -457,10 +459,9 @@ export default {
 .user-option {
   overflow: hidden;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   flex-direction: row;
-  border-top: #afb1b4 solid 1px;
   margin: 10px;
   padding: 10px 0;
   height: 46px;
@@ -477,6 +478,7 @@ export default {
   justify-content: center;
   align-items: center;
   margin-left: 14px;
+  margin-right: 4px;
 }
 
 .iconfont {
