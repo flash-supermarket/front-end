@@ -28,6 +28,7 @@
                     </div>
                 </div>
             </div>
+            <div :style="spacerStyle"></div>
         </div>
     </div>
 </template>
@@ -44,6 +45,12 @@ const router = useRouter()
 const query = ref('')
 const search_result = ref([])
 const search_article = computed(() => search_result.value)
+const spacerStyle = computed(() => ({
+  position: 'absolute',
+  width: '100%',
+  height: '50px',
+  top: `${search_result.value.length / 3 * 420 - 180}px`
+}))
 defineComponent({
     components: {
         topBar
@@ -152,7 +159,6 @@ onMounted(() => {
     position: absolute;
     left: 0;
     width: 100%;
-    min-height: 200px;
     top: 170px;
 }
 
@@ -162,7 +168,6 @@ onMounted(() => {
     width: min(calc(90% - 40px), 1010px);
     padding-left: 20px;
     padding-right: 20px;
-    height: 970px;
     background-color: rgba(255, 255, 255, 1);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -175,6 +180,7 @@ margin-top: 30px;
 }
 .tab-content {
   padding: 16px;
+  padding-bottom: 50px;
   min-width: 1000px;
   color: #333;
   display: flex;
