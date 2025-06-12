@@ -24,10 +24,31 @@ export async function insertArtical(articalBody) {
 
 export async function alterArticle(articalBody){
     try {
+        // articalBody = json2string(articalBody);
+        const deleteUrl = 'http://8.210.10.16:9200/artical/_delete_by_query';
+
+        const deleteBody = {
+            query: {
+                "term": {
+                    "id": articalBody['id']
+                }
+            }
+        };
+
+        await axios.post(deleteUrl, deleteBody, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+        });
+
+        await axios.post(
+            'http://8.210.10.16:9200/artical/_doc', // 索引名 + _doc + 文档ID（可省略）
+            articalBody
+        );
 
         return true;
     } catch (error) {
-        console.error('Error inserting Artical:', error.response?.data || error.message);
+        console.error('Error editting Artical:', error.response?.data || error.message);
         return false;
     }
 }
@@ -221,4 +242,11 @@ function parseJson(jsons) {
         }
     }
     return jsons;
+}
+
+function json2string(json) {
+    for (const k in json) {
+        json[k] = JSON.stringify(json[k]);
+    }
+    return json;
 }
