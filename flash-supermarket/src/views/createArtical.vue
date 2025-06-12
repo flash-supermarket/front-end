@@ -16,7 +16,7 @@
             <div style=" margin-left: 5%; width: 45%; height: 80%; align-items: center;">
                 <input v-model="titleText" placeholder="标题..."
                     style="font-size: 20px; font-weight: 700;width: 75%; padding: 0.5rem;border: 1px solid rgba(0, 0, 0, 0.1); resize: none; outline: none; " />
-                <el-button type="primary" @click="submitLeftList" style="margin-left: 5%;">完成</el-button>
+                <el-button type="primary" @click="submitLeftList" style="margin-left: 5%;" :disabled="canAskLLM">完成</el-button>
                 <textarea v-model="descriptionText" placeholder="简介..."
                     style="margin-top: 10px;font-size: 16px; font-weight: 700;width: 100%; height: 60%; padding: 0.5rem;border: 1px solid rgba(0, 0, 0, 0.1); resize: none; outline: none; "></textarea>
             </div>
@@ -42,11 +42,11 @@
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <el-button @click="moveUp(index)" type="primary" style="margin-bottom: 0.25rem;" :icon="Top"
-                            circle />
+                            circle :disabled="canAskLLM"/>
                         <el-button @click="moveDown(index)" type="primary"
-                            style="margin-bottom: 0.25rem; margin-left: 0px;" :icon="Bottom" circle />
+                            style="margin-bottom: 0.25rem; margin-left: 0px;" :icon="Bottom" circle :disabled="canAskLLM"/>
                         <el-button @click="removeFromLeft(index)" type="danger" style="margin-left: 0px;" :icon="Minus"
-                            circle />
+                            circle :disabled="canAskLLM"/>
                     </div>
                 </div>
                 <div v-if="leftList.length == 0"
@@ -67,7 +67,7 @@
                     <el-input v-model="searchText" style="max-width: 600px" placeholder="Please input"
                         class="input-with-select">
                         <template #append>
-                            <el-button :icon="Search" @click="handleChange" />
+                            <el-button :icon="Search" @click="handleChange" :disabled="canAskLLM"/>
                         </template>
                     </el-input>
                     <!-- <img src="../assets/icon/search.png" style="width: 30px; margin-top: 30px;" /> -->
@@ -84,7 +84,7 @@
                                 reduceStrLen(item.description.join(''), 380) }}</span>
                         </div>
                     </div>
-                    <el-button @click="addToLeft(item)" type="success" :icon="Plus" circle />
+                    <el-button @click="addToLeft(item)" type="success" :icon="Plus" circle :disabled="canAskLLM"/>
                 </div>
                 <div v-if="rightList.length == 0"
                     style="width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
@@ -106,7 +106,7 @@ import { alterArticle, getArticalNum, insertArtical } from "@/es/createArtical"
 import { Plus, Minus, Top, Bottom, Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus'
 import { getUsername } from '@/http/cookie'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { search1Artical } from '@/es/createArtical'
 
 interface Item {
@@ -127,7 +127,7 @@ const searchText = ref('')
 const isEdit = ref(false)
 const router = useRoute();
 const repoId = ref(-1)
-
+const jumpRouter = useRouter()
 
 const handleSubmit = async () => {
     canAskLLM.value = true;
@@ -195,6 +195,7 @@ const submitLeftList = async () => {
                     message: '创建成功',
                     type: 'success',
                 })
+                jumpRouter.push(`/article/${id + 1}`);
                 return;
             }
         }
