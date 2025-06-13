@@ -30,7 +30,7 @@
         <div id="showedList">
           <div v-for="item in showList" :key="item.userName"
             style="display: flex; align-items: center;margin-top: 15px;">
-            <el-avatar :src="(item.avatar==null || item.avatar=='')?default_avatar:item.avatar" style="margin-right: 12px"></el-avatar>
+            <el-avatar :src="default_avatar" style="margin-right: 12px"></el-avatar>
             <span style="cursor: pointer;" @click="gotoUser(item.userName)">{{ item.userName }}</span>
           </div>
         </div>
