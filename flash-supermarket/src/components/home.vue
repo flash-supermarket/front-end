@@ -78,7 +78,7 @@ import { onMounted, ref, defineComponent, computed, triggerRef, watch } from 'vu
 import { useRouter } from 'vue-router';
 import topBar from "@/components/topBar.vue"
 import PostCard from "@/components/post.vue"
-import { searchArticalIds4Home, searchArticalIdsFromName } from "@/es/createArtical"
+import { searchArticalIds4Home, searchArticalIdsFromName, searchArticalIdsByQuery, searchArtical4Home } from "@/es/createArtical"
 import { getIsLogin, getUsername } from "@/http/cookie"
 import { getUserInfo } from "@/apis/personPage"
 defineComponent({
@@ -158,30 +158,22 @@ const randomFollow = computed(() => {
     return follow_posts.value.slice(0, 9)
 })
 async function getLinks() {
-    // let works = [];
-    // let tmp;
-    // if (state.value.length == 0) {
-    //     tmp = await getRandomWork();
-    // }
-    // else {
-    //     tmp = await searchWorksByTitle(state.value);
-    // }
-    // for (let work of tmp.hits.hits) {
-    //     works.push({
-    //     value: work._source.title,
-    //     link: ''
-    //     })
-    // }
-    // return works;
-    return [
-        { value: 'vue', link: 'https://github.com/vuejs/vue' },
-        { value: 'element', link: 'https://github.com/ElemeFE/element' },
-        { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-        { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-        { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-        { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-        { value: 'babel', link: 'https://github.com/babel/babel' },
-    ];
+    let works = [];
+    let tmp;
+    if (state.value.length == 0) {
+        tmp = await searchArticalIds4Home();
+    }
+    else {
+        tmp = await searchArticalIdsByQuery(state.value);
+    }
+    for (let id of tmp) {
+        const searchResult = await searchArtical4Home(id);
+        works.push({
+            value: searchResult.title,
+            link: ''
+        })
+    }
+    return works.slice(0, 10);
 }
 
 const createFilter = (queryString: string) => {
