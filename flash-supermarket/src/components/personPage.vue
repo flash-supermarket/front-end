@@ -293,11 +293,12 @@ export default {
       return this.followingList.length;
     },
     avatar_url(){
-      if(this.my_avatar==""||this.my_avatar==null){
-        return default_avatar;
-      }else{
-        return this.my_avatar;
-      }
+      // if(this.my_avatar==""||this.my_avatar==null){
+      //   return default_avatar;
+      // }else{
+      //   return this.my_avatar;
+      // }
+      return default_avatar;
     },
     no_Posts(){
       return this.showPostList.length === 0;
