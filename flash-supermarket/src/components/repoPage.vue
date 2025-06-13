@@ -286,9 +286,10 @@ export default {
       return this.postInfo.collectPersonList.length;
     },
     true_avatar(){
-      if(this.postInfo.avatar === ""|| this.postInfo.avatar === null||this.postInfo.avatar === undefined){
-        return default_avatar;
-      }else return this.postInfo.avatar;
+      // if(this.postInfo.avatar === ""|| this.postInfo.avatar === null||this.postInfo.avatar === undefined){
+      //   return default_avatar;
+      // }else return this.postInfo.avatar;
+      return default_avatar;
     },
     
   },
