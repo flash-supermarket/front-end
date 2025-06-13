@@ -269,7 +269,10 @@ const addToLeft = (item: Item) => {
 }
 
 const removeFromLeft = (index: number) => {
-    leftList.value.splice(index, 1)
+    for (let i = index;i<leftList.value.length - 1 ;i++) {
+        leftList.value[i] = leftList.value[i + 1];
+    }
+    leftList.value.splice(leftList.value.length - 1, 1)
 }
 
 const moveUp = (index: number) => {
